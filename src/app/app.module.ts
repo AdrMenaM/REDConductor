@@ -22,6 +22,7 @@ import { List1Page } from '../pages/list-1/list-1';
 import { List2Page } from '../pages/list-2/list-2';
 import { GridPage } from '../pages/grid/grid';
 import { FormLayoutPage } from '../pages/form-layout/form-layout';
+import { FormDeliveryPage } from '../pages/delivery/form-delivery';
 import { FiltersPage } from '../pages/filters/filters';
 import { TermsOfServicePage } from '../pages/terms-of-service/terms-of-service';
 import { PrivacyPolicyPage } from '../pages/privacy-policy/privacy-policy';
@@ -54,7 +55,11 @@ import { ContactCardPage } from '../pages/contact-card/contact-card';
 import { FacebookLoginService } from '../pages/facebook-login/facebook-login.service';
 import { GoogleLoginService } from '../pages/google-login/google-login.service';
 import { GoogleMapsService } from '../pages/maps/maps.service';
+
 import { Storage } from '@ionic/storage';
+
+import { SignaturePadModule } from 'angular2-signaturepad';
+
 
 //MyPages
 
@@ -88,6 +93,7 @@ const cloudSettings: CloudSettings = {
     List2Page,
     GridPage,
     FormLayoutPage,
+    FormDeliveryPage,
     FiltersPage,
     TermsOfServicePage,
     PrivacyPolicyPage,
@@ -110,6 +116,7 @@ const cloudSettings: CloudSettings = {
   imports: [
     IonicModule.forRoot(MyApp),
     IonicModule.forRoot(MyApp),
+    SignaturePadModule,
     CloudModule.forRoot(cloudSettings)
   ],
   bootstrap: [IonicApp],
@@ -119,6 +126,7 @@ const cloudSettings: CloudSettings = {
     FeedPage,
     FollowersPage,
     LayoutsPage,
+    FormDeliveryPage,
     FormsPage,
     LoginPage,
     NotificationsPage,

@@ -80,12 +80,18 @@
   
 // }
 
-import { Component, ViewChild } from '@angular/core';
+
+
+import { Component, ViewChild, NgZone } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { SignaturePad } from 'angular2-signaturepad/signature-pad';
 import { Storage } from '@ionic/storage';
 import { ToastController } from 'ionic-angular';
 import { Validators, FormGroup, FormControl } from '@angular/forms';
+
+import * as io from 'socket.io-client';
+import * as moment from 'moment';
+
  
 @Component({
    selector: 'form-delivery-page',
@@ -94,7 +100,13 @@ import { Validators, FormGroup, FormControl } from '@angular/forms';
 export class FormDeliveryPage {
   signature = '';
   isDrawing = false;
+  
   delivery_form: FormGroup;
+
+  socketHost: string = 'http://34.195.35.232:8080/';
+  socket:any;
+  zone:any;
+  JourneyRoute: any;
  
   @ViewChild(SignaturePad) signaturePad: SignaturePad;
 
@@ -107,11 +119,24 @@ export class FormDeliveryPage {
   };
  
   constructor(public navController: NavController, public storage: Storage, public toastCtrl: ToastController) {
+    
+    this.socket=io.connect(this.socketHost);
+    this.zone= new NgZone({enableLongStackTrace: false});
+    
     this.delivery_form = new FormGroup({
       observation: new FormControl(''),
       // signature: new FormControl('')
+      
      
     });
+    this.storage.get('person').then((val)=>{
+      this.socket.emit('RequestJourneyRoute', val.PERSONID); //request al servidor con el parametro
+    })
+
+    this.socket.on('JourneyRouteData',(data)=>{
+      this.JourneyRoute=data[0];
+
+    })
   }
  
   ionViewDidEnter() {
@@ -130,9 +155,21 @@ export class FormDeliveryPage {
   }
  
   savePad() {
+    
+
     this.signature = this.signaturePad.toDataURL();
-    this.storage.set('savedSignature', this.signature);
+    var split_1: string[] = this.signature.split(';');
+    var split_2 = split_1[1].replace("base64,", "");
+    this.storage.set('savedSignature', split_2);
+
+    let deliveryData={journeyid: this.JourneyRoute.journeyid, observation: this.delivery_form.get('observation').value, signature: split_2 , deliverytime: moment().format('YYYY-MM-DD h:mm:ss')};
+
+    this.socket.emit('RegisterDelivery',deliveryData);    
+    
+    
+
     this.signaturePad.clear();
+    
     let toast = this.toastCtrl.create({
       message: 'New Signature saved.',
       duration: 3000

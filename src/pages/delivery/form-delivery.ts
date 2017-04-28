@@ -131,12 +131,12 @@ export class FormDeliveryPage {
     });
     this.storage.get('person').then((val)=>{
       this.socket.emit('RequestJourneyRoute', val.PERSONID); //request al servidor con el parametro
-    })
+    });
 
     this.socket.on('JourneyRouteData',(data)=>{
       this.JourneyRoute=data[0];
-
-    })
+      console.log(this.JourneyRoute);
+    });
   }
  
   ionViewDidEnter() {
@@ -162,8 +162,8 @@ export class FormDeliveryPage {
     var split_2 = split_1[1].replace("base64,", "");
     this.storage.set('savedSignature', split_2);
 
-    let deliveryData={journeyid: this.JourneyRoute.journeyid, observation: this.delivery_form.get('observation').value, signature: split_2 , deliverytime: moment().format('YYYY-MM-DD h:mm:ss')};
-
+    let deliveryData={journeyid: this.JourneyRoute.JourneyId, observation: this.delivery_form.get('observation').value, signature: split_2 , deliverytime: moment().format('YYYY-MM-DD h:mm:ss')};
+    console.log(this.JourneyRoute.journeyid);
     this.socket.emit('RegisterDelivery',deliveryData);    
     
     

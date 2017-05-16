@@ -22,6 +22,10 @@ import { List1Page } from '../pages/list-1/list-1';
 import { List2Page } from '../pages/list-2/list-2';
 import { GridPage } from '../pages/grid/grid';
 import { FormLayoutPage } from '../pages/form-layout/form-layout';
+
+import { SignatureForm } from '../pages/signatureForm/signature-form';
+import { SignatureForm2 } from '../pages/signatureForm2/signature-form';
+
 import { FormDeliveryPage } from '../pages/delivery/form-delivery';
 import { FiltersPage } from '../pages/filters/filters';
 import { TermsOfServicePage } from '../pages/terms-of-service/terms-of-service';
@@ -104,6 +108,8 @@ const cloudSettings: CloudSettings = {
     ContactCardPage,
     PopoverPage,
     PopoverPageEmergency,
+    SignatureForm,
+    SignatureForm2,
     PreloadImage,
     BackgroundImage,
     ShowHideContainer,
@@ -127,6 +133,8 @@ const cloudSettings: CloudSettings = {
     FollowersPage,
     LayoutsPage,
     FormDeliveryPage,
+    SignatureForm,
+    SignatureForm2,
     FormsPage,
     LoginPage,
     NotificationsPage,

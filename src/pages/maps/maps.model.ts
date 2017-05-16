@@ -31,6 +31,7 @@ export class MapsModel {
 	// https://developers.google.com/maps/documentation/javascript/reference#Map
 	init(map: google.maps.Map) {
 		this.map = map;
+		// this.map.
 		// https://developers.google.com/maps/documentation/javascript/reference#DirectionsRenderer
 		this.directions_display = new google.maps.DirectionsRenderer({
 			map: this.map,
@@ -64,6 +65,7 @@ export class MapsModel {
 		_map_place.marker = new google.maps.Marker({
       position: location,
       map: this.map,
+			draggable: true,
       icon: './assets/images/maps/truck.png'
     });
 
@@ -110,6 +112,38 @@ export class MapsModel {
 		return _map_place;
 	}
 
+	addMilestone(location: google.maps.LatLng, contnt: string) : MapPlace {
+		let _map_place = new MapPlace();
+
+		_map_place.location = location;
+		_map_place.marker = new google.maps.Marker({
+      position: location,
+      map: this.map,
+      icon: {
+               path: google.maps.SymbolPath.CIRCLE,
+               fillColor: 'red',
+               fillOpacity: 3,
+               scale: 3,
+               strokeWeight: 1
+             }
+    });
+		var currentInfoWindow = null;
+		_map_place.marker.addListener('click', ()=>{let infoWindow = new google.maps.InfoWindow({content: contnt}); 
+			
+			if (currentInfoWindow != null) { 
+        currentInfoWindow.close(); 
+			}
+			infoWindow.open(_map_place.marker.get('map'), _map_place.marker); 
+			currentInfoWindow = infoWindow; 
+		});
+
+
+		this.map_places.push(_map_place);
+
+
+
+		return _map_place;
+	}
 
 	// addNearbyPlace(place_result: google.maps.places.PlaceResult) {
 	// 	let _map_place = this.addPlaceToMap(place_result.geometry.location, '#666666');

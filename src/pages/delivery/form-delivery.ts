@@ -115,7 +115,8 @@ export class FormDeliveryPage {
     'canvasWidth': 400,
     'canvasHeight': 250,
     'backgroundColor': '#f6fbff',
-    'penColor': '#666a73'
+    'penColor': '#194e92',
+    'throttle': 5
   };
  
   constructor(public navController: NavController, public storage: Storage, public toastCtrl: ToastController) {
@@ -180,6 +181,7 @@ export class FormDeliveryPage {
   clearPad() {
     this.signaturePad.clear();
   }
+  
   createDelivery(){
     console.log(this.delivery_form.value);
     this.storage.get('savedSignature').then((signature)=>{console.log(signature +"----"+ typeof(signature))});

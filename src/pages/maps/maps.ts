@@ -241,7 +241,7 @@ export class MapsPage implements OnInit {
     });
 
     this.socket.on('JourneyRouteData',(data)=>{
-      this.JourneyRoute=data[0];
+      this.JourneyRoute=data[data.length-1];
 
     });
     // fin manejo socket  

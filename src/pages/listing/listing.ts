@@ -93,8 +93,9 @@ export class ListingPage {
     })
 
     this.socket.on('JourneyRouteData',(data)=>{
-      this.JourneyRoute=data[0];
-      console.log(this.JourneyRoute.JourneyId);
+      // console.log(data.length);
+      this.JourneyRoute=data[data.length-1];
+      // console.log(this.JourneyRoute.JourneyId);
       this.socket.emit('RequestJourneyOrders',this.JourneyRoute.JourneyId);
     })
     // var JournId=this.JourneyRoute.JourneyId;

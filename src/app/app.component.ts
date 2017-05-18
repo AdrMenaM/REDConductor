@@ -38,14 +38,14 @@ export class MyApp {
     });
 
     this.pages = [
-      { title: 'Home', icon: 'home', component: TabsNavigationPage },
-      { title: 'Forms', icon: 'create', component: FormsPage },
-      { title: 'Functionalities', icon: 'code', component: FunctionalitiesPage }
+      { title: 'Inicio', icon: 'home', component: TabsNavigationPage },
+      // { title: 'Forms', icon: 'create', component: FormsPage },
+      // { title: 'Functionalities', icon: 'code', component: FunctionalitiesPage }
     ];
 
     this.pushPages = [
-      { title: 'Layouts', icon: 'grid', component: LayoutsPage },
-      { title: 'Settings', icon: 'settings', component: SettingsPage },
+      // { title: 'Layouts', icon: 'grid', component: LayoutsPage },
+      { title: 'Perfil', icon: 'settings', component: SettingsPage },
     ];
   }
 

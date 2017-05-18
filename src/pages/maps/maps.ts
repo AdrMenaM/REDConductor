@@ -177,6 +177,8 @@ export class MapsPage implements OnInit {
   Orders:any=[];
   lstRoutePoint:any=[];
   k: any=0;
+  registrandoPosicion: boolean=false;
+
   // Fin manejo socket
   map_model: MapsModel = new MapsModel();
   constructor(
@@ -286,8 +288,30 @@ export class MapsPage implements OnInit {
   }
 
   beginJourney(){
+
+    // var routeItem=[];
+    // var orderItem=[];
+    // var distributorPosition;
+    this.socketUpdate();
+
     if($('#btnBeginJourney').text()!="Pausar"){
       $('#btnBeginJourney').text("Pausar");
+      
+      // for(var i = 0; i < this.lstDistributors.length; i++){
+      // for(var j=0;j<this.Orders.length;j++){
+      //   // this.lstDistributors[i].DistributorId==route[j]
+      //   if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+          
+      //     routeItem.push(this.lstDistributors[i]);
+      //     if(this.Orders[j].OrderState=="En Proceso"){
+      //       orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
+      //       }
+      //     }     
+
+      //   }
+      // }
+
+      // routeItem.reverse();
       
       this.userMarker.marker.setIcon('./assets/images/maps/truckS.png');
        this.watch=Geolocation.watchPosition({enableHighAccuracy: true,maximumAge: 30000}).subscribe((position: Geoposition)=>{
@@ -297,7 +321,16 @@ export class MapsPage implements OnInit {
               position: ultimaPosicion,
               user: this.current_user
             }
+              
+
+      //         distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
+      //         if(google.maps.geometry.spherical.computeDistanceBetween(ultimaPosicion,distributorPosition) < 300){
+      //           this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
+      //           routeItem.pop();
+      // //waypnts.push(distributorPosition);
+            // }
             // Manejo socket
+            // console.log("apptrucklocation"+info);
             this.socket=io.connect(this.socketHost);
             this.zone= new NgZone({enableLongStackTrace: false});
             this.socket.emit('AppTruckLocation',info);
@@ -540,9 +573,16 @@ export class MapsPage implements OnInit {
     for(var i=0;i<routeItem.length;i++){
       distributorPosition = new google.maps.LatLng(routeItem[i].CoordX, routeItem[i].CoordY);
       let content = '<h4>'+routeItem[i].DistributorName+'</h4><p>'+routeItem[i].DistributorAddress+'</p><p> Telf: '+routeItem[i].DistributorPhone+'</p><p>Stock disponible: '+this.Orders[i].OrderQuantity+' </p>';
-      this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5', content);
+      this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5', content,this.Orders[i].OrderState);
       //waypnts.push(distributorPosition);
     }
+
+    // for(var i=0;i<orderItem.length;i++){
+    //   distributorPosition = new google.maps.LatLng(orderItem[i].CoordX, orderItem[i].CoordY);
+    //   let content = '<h4>'+orderItem[i].DistributorName+'</h4><p>'+orderItem[i].DistributorAddress+'</p><p> Telf: '+orderItem[i].DistributorPhone+'</p><p>Stock disponible: '+this.Orders[i].OrderQuantity+' </p>';
+    //   this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5', content,"Completado");
+    //   //waypnts.push(distributorPosition);
+    // }
 
       var recyclerPosition=new google.maps.LatLng(recycler.CoordX, recycler.CoordY);
       let recyclerContent='<h4>'+recycler.RecyclingCenterName+'</h4><p>'+recycler.RecyclingCenterAddress+'</p><p> Telf: '+recycler.RecyclingCenterPhone+'</p>';
@@ -583,7 +623,8 @@ export class MapsPage implements OnInit {
               });
           toast.present();
           console.log(this.steps);
-          //this.presentPopover(steps) ; 
+          //this.presentPopover(steps) ;
+          this.lstRoutePoint=[]; 
           this.numMilestone = data[0].routes[0];
           for (var j = 0; j < this.numMilestone.legs.length; j++) {
             this.milestone = data[0].routes[0].legs[j];

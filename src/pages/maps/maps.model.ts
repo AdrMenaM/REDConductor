@@ -73,16 +73,25 @@ export class MapsModel {
 
 		return _map_place;
 	}
-	addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: string) : MapPlace {
+	addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: string, state:string) : MapPlace {
 		let _map_place = new MapPlace();
 
 		_map_place.location = location;
+		if(state=="Completado"){
+			_map_place.marker = new google.maps.Marker({
+				position: location,
+				map: this.map,
+				icon: './assets/images/maps/dListo.png',
+			
+    	});
+		}else{
 		_map_place.marker = new google.maps.Marker({
       position: location,
       map: this.map,
-      icon: './assets/images/maps/llanta.png',
+      icon: './assets/images/maps/dPendiente.png',
 			
     });
+		}
 		
 		_map_place.marker.addListener('click', ()=>{let infoWindow = new google.maps.InfoWindow({content: contnt}); infoWindow.open(_map_place.marker.get('map'), _map_place.marker) });
 

@@ -289,29 +289,29 @@ export class MapsPage implements OnInit {
 
   beginJourney(){
 
-    // var routeItem=[];
-    // var orderItem=[];
-    // var distributorPosition;
+    var routeItem=[];
+    var orderItem=[];
+    var distributorPosition;
     this.socketUpdate();
 
     if($('#btnBeginJourney').text()!="Pausar"){
       $('#btnBeginJourney').text("Pausar");
       
-      // for(var i = 0; i < this.lstDistributors.length; i++){
-      // for(var j=0;j<this.Orders.length;j++){
-      //   // this.lstDistributors[i].DistributorId==route[j]
-      //   if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+      for(var i = 0; i < this.lstDistributors.length; i++){
+      for(var j=0;j<this.Orders.length;j++){
+        // this.lstDistributors[i].DistributorId==route[j]
+        if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
           
-      //     routeItem.push(this.lstDistributors[i]);
-      //     if(this.Orders[j].OrderState=="En Proceso"){
-      //       orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
-      //       }
-      //     }     
+          routeItem.push(this.lstDistributors[i]);
+          if(this.Orders[j].OrderState=="En Proceso"){
+            orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
+            }
+          }     
 
-      //   }
-      // }
+        }
+      }
 
-      // routeItem.reverse();
+      routeItem.reverse();
       
       this.userMarker.marker.setIcon('./assets/images/maps/truckS.png');
        this.watch=Geolocation.watchPosition({enableHighAccuracy: true,maximumAge: 30000}).subscribe((position: Geoposition)=>{
@@ -323,20 +323,21 @@ export class MapsPage implements OnInit {
             }
               
 
-      //         distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
-      //         if(google.maps.geometry.spherical.computeDistanceBetween(ultimaPosicion,distributorPosition) < 300){
-      //           this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
-      //           routeItem.pop();
-      // //waypnts.push(distributorPosition);
-            // }
+              distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
+              if(google.maps.geometry.spherical.computeDistanceBetween(ultimaPosicion,distributorPosition) < 300){
+                this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
+                routeItem.pop();
+      //waypnts.push(distributorPosition);
+            }
             // Manejo socket
             // console.log("apptrucklocation"+info);
             this.socket=io.connect(this.socketHost);
             this.zone= new NgZone({enableLongStackTrace: false});
             this.socket.emit('AppTruckLocation',info);
+            this.markMilestone();
             // Fin Manejo socket
       });
-      this.markMilestone();
+      
     }else{
         $('#btnBeginJourney').text("Iniciar Viaje");
         this.watch.unsubscribe();
@@ -402,6 +403,44 @@ export class MapsPage implements OnInit {
     //     console.log('onCompleted');
     //   }
     // );
+  }
+
+  sendPosition(){
+    var routeItem=[];
+    var orderItem=[];
+    var distributorPosition;
+    for(var i = 0; i < this.lstDistributors.length; i++){
+      for(var j=0;j<this.Orders.length;j++){
+        // this.lstDistributors[i].DistributorId==route[j]
+        if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+          
+          routeItem.push(this.lstDistributors[i]);
+          if(this.Orders[j].OrderState=="En Proceso"){
+            orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
+            }
+          }     
+
+        }
+      }
+
+      routeItem.reverse();
+
+    console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
+    var info={
+              position: this.userMarker.marker.getPosition(),
+              user: this.current_user
+            }
+
+            distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
+              if(google.maps.geometry.spherical.computeDistanceBetween(info.position,distributorPosition) < 300){
+                this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
+                routeItem.pop();
+      //waypnts.push(distributorPosition);
+            }
+
+            // this.socket=io.connect(this.socketHost);
+            // this.zone= new NgZone({enableLongStackTrace: false});
+            this.socket.emit('AppTruckLocation',info);
   }
 
   selectSearchResult(place: google.maps.places.AutocompletePrediction){

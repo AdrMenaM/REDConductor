@@ -2,7 +2,7 @@
   <ion-navbar>
     <ion-title>Perfil</ion-title>
     <ion-buttons end [hidden]="!settingsForm.dirty">
-      <button ion-button>
+      <button ion-button (click)='saveChanges()'>
         Guardar
       </button>
     </ion-buttons>
@@ -10,14 +10,15 @@
 </ion-header>
 
 <ion-content class="settings-content">
-  <div class="user-image-content">
+  <!--<div class="user-image-content">
     <ion-row no-padding class="user-image-row">
       <ion-col no-padding width-40>
         <preload-image class="user-image" [ratio]="{w:1, h:1}" [src]="profile.user.image" alt="aca va la img" title="IMAGE!"></preload-image>
       </ion-col>
     </ion-row>
     <h3 class="image-action">Cambiar imagen de perfil</h3>
-  </div>
+  </div>-->
+  <div style="height: 20px"></div>
 
   <form [formGroup]="settingsForm" class="settings-form">
     <ion-list class="user-data-content">
@@ -26,13 +27,31 @@
         <ion-input type="text" formControlName="name"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label stacked>Ubicación</ion-label>
-        <ion-input type="text" formControlName="location"></ion-input>
+        <ion-label stacked>Apellido</ion-label>
+        <ion-input type="text" formControlName="lastname"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label stacked>Descripción</ion-label>
-        <ion-textarea formControlName="description" rows="5" placeholder="Escriba una descripción..."></ion-textarea>
+        <ion-label stacked>Cédula/RUC</ion-label>
+        <ion-input type="text" formControlName="ruc"></ion-input>
       </ion-item>
+      <ion-item>
+        <ion-label stacked>Teléfono</ion-label>
+        <ion-input type="tel" formControlName="phone"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>Dirección</ion-label>
+        <ion-input formControlName="address"  ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>E-mail</ion-label>
+        <ion-input formControlName="email" ></ion-input>
+      </ion-item>
+      <!--<img id="MapImage" (click)="SetPosition()" src="https://maps.googleapis.com/maps/api/staticmap?center=-1.703447,-78.8145726&zoom=10&size=400x300&scale=2&markers=icon:https://s3-us-west-2.amazonaws.com/ionicthemes-apps-assets/ion2FullApp/pin.min.png|-1.703447,-78.8145726">-->
+      <show-hide-container>
+      <ion-item>
+        <ion-input type="password"  formControlName="password" show-hide-input></ion-input>
+      </ion-item>
+    </show-hide-container>
     </ion-list>
 
     <!--<ion-row class="user-preferences-row">
@@ -73,12 +92,12 @@
       </ion-list>
     </ion-row>-->
 
-    <ion-list class="switchers-list">
+    <!--<ion-list class="switchers-list">
       <ion-item class="switcher-item">
         <ion-label>Notificaciones</ion-label>
         <ion-toggle formControlName="notifications"></ion-toggle>
       </ion-item>
-    </ion-list>
+    </ion-list>-->
   </form>
 
   <button class="alt-button" ion-button full (click)="showPrivacyModal()">Políticas de privacidad</button>

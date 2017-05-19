@@ -62,4 +62,11 @@ export class MyApp {
     // rootNav is now deprecated (since beta 11) (https://forum.ionicframework.com/t/cant-access-rootnav-after-upgrade-to-beta-11/59889)
     this.app.getRootNav().push(page.component);
   }
+
+  logout() {
+    // navigate to the new page if it is not the current page
+    this.menu.close();
+    this.nav.setRoot(this.rootPage);
+    
+  }
 }

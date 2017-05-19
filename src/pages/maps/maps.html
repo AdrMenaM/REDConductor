@@ -2,6 +2,9 @@
   <ion-navbar>
     <ion-title>Ruta</ion-title>
     <ion-buttons end>
+      <button ion-button icon-only (click)="sendPosition()">
+        Posicion
+      </button>
       <button ion-button icon-only (click)="presentPopover($event)">
         <ion-icon name="navigate"></ion-icon>
       </button>

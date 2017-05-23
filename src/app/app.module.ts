@@ -74,7 +74,19 @@ import {PopoverPageEmergency} from '../pages/maps/maps';
 
 const cloudSettings: CloudSettings = {
   'core': {
-    'app_id': '6375b85e'
+    'app_id': '6375b85e',
+  },
+  'push': {
+    'sender_id': '737509012599',
+    'pluginConfig': {
+      'ios': {
+        'badge': true,
+        'sound': true
+      },
+      'android': {
+        'iconColor': '#343434'
+      }
+    }
   }
 };
 

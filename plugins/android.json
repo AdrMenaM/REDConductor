@@ -50,6 +50,10 @@
         },
         "ionic-plugin-keyboard": {
             "PACKAGE_NAME": "com.b2red.app"
+        },
+        "phonegap-plugin-push": {
+            "SENDER_ID": "737509012599",
+            "PACKAGE_NAME": "com.b2red.app"
         }
     },
     "dependent_plugins": {

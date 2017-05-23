@@ -9,6 +9,11 @@ import { WalkthroughPage } from '../pages/walkthrough/walkthrough';
 import { SettingsPage } from '../pages/settings/settings';
 import { FunctionalitiesPage } from '../pages/functionalities/functionalities';
 
+import {
+  Push,
+  PushToken
+} from '@ionic/cloud-angular';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.html'
@@ -28,7 +33,8 @@ export class MyApp {
   constructor(
     platform: Platform,
     public menu: MenuController,
-    public app: App
+    public app: App,
+    public push: Push
   ) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
@@ -47,7 +53,20 @@ export class MyApp {
       // { title: 'Layouts', icon: 'grid', component: LayoutsPage },
       { title: 'Perfil', icon: 'settings', component: SettingsPage },
     ];
+
+    this.push.register().then((t: PushToken) => {
+      return this.push.saveToken(t);
+      }).then((t: PushToken) => {
+        console.log('Token saved:', t.token);
+      });
+
+    this.push.rx.notification()
+    .subscribe((msg) => {
+      alert(msg.title + ': ' + msg.text);
+    });
   }
+
+  
 
   openPage(page) {
     // close the menu when clicking a link from the menu

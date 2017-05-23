@@ -4,6 +4,7 @@ import { MyApp } from './app.component';
 import { CloudSettings, CloudModule } from '@ionic/cloud-angular';
 
 
+
 import { ListingPage } from '../pages/listing/listing';
 import { FeedPage } from '../pages/feed/feed';
 import { FollowersPage } from '../pages/followers/followers';
@@ -40,6 +41,7 @@ import { CounterInput } from '../components/counter-input/counter-input';
 import { Rating } from '../components/rating/rating';
 import { GoogleMap } from '../components/google-map/google-map';
 
+
 import { FeedService } from '../pages/feed/feed.service';
 import { ListingService } from '../pages/listing/listing.service';
 import { ProfileService } from '../pages/profile/profile.service';
@@ -72,7 +74,7 @@ import {PopoverPageEmergency} from '../pages/maps/maps';
 
 const cloudSettings: CloudSettings = {
   'core': {
-    'app_id': 'a30146c1'
+    'app_id': '6375b85e'
   }
 };
 

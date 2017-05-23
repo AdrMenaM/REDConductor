@@ -17,7 +17,7 @@
        under the License.
  */
 
-package com.startapplabs.ion2FullApp;
+package com.b2red.app;
 
 import android.os.Bundle;
 import org.apache.cordova.*;

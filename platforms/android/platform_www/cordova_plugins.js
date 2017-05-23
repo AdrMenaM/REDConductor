@@ -1,15 +1,11 @@
 cordova.define('cordova/plugin_list', function(require, exports, module) {
 module.exports = [
     {
-        "file": "plugins/cordova-plugin-x-toast/www/Toast.js",
-        "id": "cordova-plugin-x-toast.Toast",
+        "file": "plugins/call-number/www/CallNumber.js",
+        "id": "call-number.CallNumber",
         "clobbers": [
-            "window.plugins.toast"
+            "call"
         ]
-    },
-    {
-        "file": "plugins/cordova-plugin-x-toast/test/tests.js",
-        "id": "cordova-plugin-x-toast.tests"
     },
     {
         "file": "plugins/cordova-plugin-device/www/device.js",
@@ -19,26 +15,38 @@ module.exports = [
         ]
     },
     {
-        "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
-        "id": "cordova-plugin-splashscreen.SplashScreen",
+        "file": "plugins/cordova-plugin-facebook4/www/facebook-native.js",
+        "id": "cordova-plugin-facebook4.FacebookConnectPlugin",
         "clobbers": [
-            "navigator.splashscreen"
+            "facebookConnectPlugin"
         ]
     },
     {
-        "file": "plugins/cordova-plugin-statusbar/www/statusbar.js",
-        "id": "cordova-plugin-statusbar.statusbar",
+        "file": "plugins/cordova-plugin-geolocation/www/android/geolocation.js",
+        "id": "cordova-plugin-geolocation.geolocation",
         "clobbers": [
-            "window.StatusBar"
+            "navigator.geolocation"
         ]
     },
     {
-        "file": "plugins/ionic-plugin-keyboard/www/android/keyboard.js",
-        "id": "ionic-plugin-keyboard.keyboard",
-        "clobbers": [
-            "cordova.plugins.Keyboard"
-        ],
+        "file": "plugins/cordova-plugin-geolocation/www/PositionError.js",
+        "id": "cordova-plugin-geolocation.PositionError",
         "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-googleplus/www/GooglePlus.js",
+        "id": "cordova-plugin-googleplus.GooglePlus",
+        "clobbers": [
+            "window.plugins.googleplus"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-inappbrowser/www/inappbrowser.js",
+        "id": "cordova-plugin-inappbrowser.inappbrowser",
+        "clobbers": [
+            "cordova.InAppBrowser.open",
+            "window.open"
+        ]
     },
     {
         "file": "plugins/cordova-plugin-nativestorage/www/mainHandle.js",
@@ -56,11 +64,17 @@ module.exports = [
         "id": "cordova-plugin-nativestorage.NativeStorageError"
     },
     {
-        "file": "plugins/cordova-plugin-inappbrowser/www/inappbrowser.js",
-        "id": "cordova-plugin-inappbrowser.inappbrowser",
+        "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
+        "id": "cordova-plugin-splashscreen.SplashScreen",
         "clobbers": [
-            "cordova.InAppBrowser.open",
-            "window.open"
+            "navigator.splashscreen"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-statusbar/www/statusbar.js",
+        "id": "cordova-plugin-statusbar.statusbar",
+        "clobbers": [
+            "window.StatusBar"
         ]
     },
     {
@@ -71,57 +85,43 @@ module.exports = [
         ]
     },
     {
-        "file": "plugins/call-number/www/CallNumber.js",
-        "id": "call-number.CallNumber",
+        "file": "plugins/cordova-plugin-x-toast/www/Toast.js",
+        "id": "cordova-plugin-x-toast.Toast",
         "clobbers": [
-            "call"
+            "window.plugins.toast"
         ]
     },
     {
-        "file": "plugins/cordova-plugin-geolocation/www/android/geolocation.js",
-        "id": "cordova-plugin-geolocation.geolocation",
-        "clobbers": [
-            "navigator.geolocation"
-        ]
+        "file": "plugins/cordova-plugin-x-toast/test/tests.js",
+        "id": "cordova-plugin-x-toast.tests"
     },
     {
-        "file": "plugins/cordova-plugin-geolocation/www/PositionError.js",
-        "id": "cordova-plugin-geolocation.PositionError",
+        "file": "plugins/ionic-plugin-keyboard/www/android/keyboard.js",
+        "id": "ionic-plugin-keyboard.keyboard",
+        "clobbers": [
+            "cordova.plugins.Keyboard"
+        ],
         "runs": true
-    },
-    {
-        "file": "plugins/cordova-plugin-facebook4/www/facebook-native.js",
-        "id": "cordova-plugin-facebook4.FacebookConnectPlugin",
-        "clobbers": [
-            "facebookConnectPlugin"
-        ]
-    },
-    {
-        "file": "plugins/cordova-plugin-googleplus/www/GooglePlus.js",
-        "id": "cordova-plugin-googleplus.GooglePlus",
-        "clobbers": [
-            "window.plugins.googleplus"
-        ]
     }
 ];
 module.exports.metadata = 
 // TOP OF METADATA
 {
-    "cordova-plugin-x-toast": "2.6.0",
-    "cordova-plugin-device": "1.1.5",
-    "cordova-plugin-console": "1.0.6",
-    "cordova-plugin-whitelist": "1.3.2",
-    "cordova-plugin-splashscreen": "4.0.2",
-    "cordova-plugin-statusbar": "2.2.2",
-    "ionic-plugin-keyboard": "2.2.1",
-    "cordova-plugin-nativestorage": "2.0.2",
-    "cordova-plugin-inappbrowser": "1.5.0",
-    "cordova-plugin-x-socialsharing": "5.1.6",
     "call-number": "0.0.2",
     "cordova-plugin-compat": "1.1.0",
-    "cordova-plugin-geolocation": "2.4.2",
+    "cordova-plugin-console": "1.0.6",
+    "cordova-plugin-device": "1.1.5",
     "cordova-plugin-facebook4": "1.7.4",
-    "cordova-plugin-googleplus": "5.1.1"
+    "cordova-plugin-geolocation": "2.4.2",
+    "cordova-plugin-googleplus": "5.1.1",
+    "cordova-plugin-inappbrowser": "1.5.0",
+    "cordova-plugin-nativestorage": "2.0.2",
+    "cordova-plugin-splashscreen": "4.0.2",
+    "cordova-plugin-statusbar": "2.2.2",
+    "cordova-plugin-whitelist": "1.3.2",
+    "cordova-plugin-x-socialsharing": "5.1.6",
+    "cordova-plugin-x-toast": "2.6.0",
+    "ionic-plugin-keyboard": "2.2.1"
 };
 // BOTTOM OF METADATA
 });

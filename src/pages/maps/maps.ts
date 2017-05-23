@@ -632,7 +632,7 @@ export class MapsPage implements OnInit {
       
 			waypnts.push({
 				location: new google.maps.LatLng(orderItem[i].CoordX,orderItem[i].CoordY),
-				stopover: false 
+				stopover: true 
 			});
       // console.log(waypnts[i]);
 		}

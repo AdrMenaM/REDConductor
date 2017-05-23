@@ -1,7 +1,7 @@
 {
-  "name": "ion2-fullapp-PRO",
-  "author": "Ionic Themes",
-  "homepage": "https://ionicthemes.com",
+  "name": "com.b2red.app",
+  "author": "Tao Tech Ideas",
+  "homepage": "https://taotechideas.com",
   "private": true,
   "scripts": {
     "ionic:build": "ionic-app-scripts build",
@@ -58,7 +58,7 @@
       "locator": "cordova-plugin-facebook4",
       "variables": {
         "APP_ID": "826720427470540",
-        "APP_NAME": "Ion2FullApp"
+        "APP_NAME": "B2RED"
       }
     },
     {
@@ -81,7 +81,7 @@
       "locator": "android"
     }
   ],
-  "description": "ion2-FullApp: An Ionic project",
+  "description": "B2RED: Recuperación Entorno y Desarrollo",
   "config": {
     "ionic_sass": "./config/sass.config.js"
   }

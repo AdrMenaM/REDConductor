@@ -440,6 +440,7 @@ export class MapsPage implements OnInit {
 
             // this.socket=io.connect(this.socketHost);
             // this.zone= new NgZone({enableLongStackTrace: false});
+            this.markMilestone();
             this.socket.emit('AppTruckLocation',info);
   }
 
@@ -671,6 +672,7 @@ export class MapsPage implements OnInit {
                this.lstRoutePoint.push(env.map_model.addMilestone(this.milestone.steps[i].start_location,this.milestone.steps[i].instructions));
              }
           }
+          this.lstRoutePoint.reverse();
           console.log("numero de hitos "+this.lstRoutePoint.length);
 
         },
@@ -694,11 +696,11 @@ export class MapsPage implements OnInit {
       for(var i=0;i<this.lstRoutePoint.length;i++){
         console.log(i+"  "+this.lstRoutePoint[i].marker.getPosition().lat()+" "+this.lstRoutePoint[i].marker.getPosition().lng())
       }
-      DistanciaLng=google.maps.geometry.spherical.computeDistanceBetween(this.userMarker.marker.getPosition(),this.lstRoutePoint[this.k].marker.getPosition());
+      DistanciaLng=google.maps.geometry.spherical.computeDistanceBetween(this.userMarker.marker.getPosition(),this.lstRoutePoint[this.lstRoutePoint.length-1].marker.getPosition());
       console.log("distancia");
       console.log(DistanciaLng);
       if(DistanciaLng < 200){
-        this.lstRoutePoint[0].marker.setIcon({
+        this.lstRoutePoint[this.lstRoutePoint.length-1].marker.setIcon({
           path: google.maps.SymbolPath.CIRCLE,
           fillColor: 'green',
           fillOpacity: 3,
@@ -707,7 +709,7 @@ export class MapsPage implements OnInit {
         });
         this.k++;
         // break;
-         this.lstRoutePoint.splice(0,0);
+         this.lstRoutePoint.pop();
          console.log("Hito marcado");
          console.log("K= "+this.k)
          for(var i=0;i<this.lstRoutePoint.length;i++){

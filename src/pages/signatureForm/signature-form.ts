@@ -108,7 +108,6 @@ export class SignatureForm {
   goToSignaturePad2(){
     this.navController.push(SignatureForm2, {data: this.pickupData});
     this.viewCtrl.dismiss();
-
   }
 
 

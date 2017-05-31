@@ -703,7 +703,7 @@ export class MapsPage implements OnInit {
         this.lstRoutePoint[this.lstRoutePoint.length-1].marker.setIcon({
           path: google.maps.SymbolPath.CIRCLE,
           fillColor: 'green',
-          fillOpacity: 3,
+          fillOpacity: 3, 
           scale: 3,
           strokeWeight: 1
         });

@@ -172,15 +172,21 @@ export class MapsPage implements OnInit {
   milestone: any=[];
   userMarker: any;
   distributorMarker: any = [];
+  lstRoutePointAux:any=[];
   watch: any;
   current_user: any;
   Orders:any=[];
   lstRoutePoint:any=[];
   k: any=0;
   registrandoPosicion: boolean=false;
+  flaglstRoute: boolean;
+  flagButton:boolean;
+  driverName:any;
+  driverPhone:any;
+  driverLastName:any;
 
   // Fin manejo socket
-  map_model: MapsModel = new MapsModel();
+  map_model: MapsModel;
   constructor(
     public nav: NavController,
     public loadingCtrl: LoadingController,
@@ -197,6 +203,12 @@ export class MapsPage implements OnInit {
     //   this.ShowJourney(aux)
     // })
     //this.ShowJourney(1);
+    this.map_model = new MapsModel();
+    this.storage.get('person').then((valPerson)=>{
+        this.driverName=valPerson.PERSONNAME,
+        this.driverLastName=valPerson.PERSONLASTNAME,
+        this.driverPhone=valPerson.PERSONPHONE
+    });
 
     
 
@@ -373,7 +385,10 @@ export class MapsPage implements OnInit {
       console.log('Bienvenido: '+ user.USEREMAIL);
     });
 
+    this.flaglstRoute=true;
+
     this.ShowJourney(location);
+
 
     
     // With this result we should find restaurants (*places) arround this location and then show them in the map
@@ -406,9 +421,48 @@ export class MapsPage implements OnInit {
   }
 
   sendPosition(){
+    // var routeItem=[];
+    // var orderItem=[];
+    // var distributorPosition;
+    // for(var i = 0; i < this.lstDistributors.length; i++){
+    //   for(var j=0;j<this.Orders.length;j++){
+    //     // this.lstDistributors[i].DistributorId==route[j]
+    //     if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+          
+    //       routeItem.push(this.lstDistributors[i]);
+    //       if(this.Orders[j].OrderState=="En Proceso"){
+    //         orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
+    //         }
+    //       }     
+
+    //     }
+    //   }
+
+    //   routeItem.reverse();
+
+    // console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
+    // var info={
+    //           position: this.userMarker.marker.getPosition(),
+    //           user: this.current_user
+    //         }
+
+    //         distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
+    //           if(google.maps.geometry.spherical.computeDistanceBetween(info.position,distributorPosition) < 300){
+    //             this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
+    //             routeItem.pop();
+    //   //waypnts.push(distributorPosition);
+    //         }
+
+    //         // this.socket=io.connect(this.socketHost);
+    //         // this.zone= new NgZone({enableLongStackTrace: false});
+    //         this.markMilestone();
+    //         this.socket.emit('AppTruckLocation',info);
+    this.lstRoutePointAux=this.lstRoutePoint;
+    //console.log(this.lstRoutePointAux.length);
     var routeItem=[];
     var orderItem=[];
     var distributorPosition;
+    this.flagButton=false;
     for(var i = 0; i < this.lstDistributors.length; i++){
       for(var j=0;j<this.Orders.length;j++){
         // this.lstDistributors[i].DistributorId==route[j]
@@ -425,7 +479,7 @@ export class MapsPage implements OnInit {
 
       routeItem.reverse();
 
-    console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
+    //console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
     var info={
               position: this.userMarker.marker.getPosition(),
               user: this.current_user
@@ -433,15 +487,22 @@ export class MapsPage implements OnInit {
 
             distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
               if(google.maps.geometry.spherical.computeDistanceBetween(info.position,distributorPosition) < 300){
+                this.flagButton=true;
+                console.log(this.flagButton);
                 this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
                 routeItem.pop();
       //waypnts.push(distributorPosition);
-            }
+              }else
+              {
+                console.log(this.flagButton);
+              }
+            this.ShowJourney(info.position);
 
             // this.socket=io.connect(this.socketHost);
             // this.zone= new NgZone({enableLongStackTrace: false});
-            this.markMilestone();
             this.socket.emit('AppTruckLocation',info);
+           
+    
   }
 
   selectSearchResult(place: google.maps.places.AutocompletePrediction){
@@ -612,8 +673,8 @@ export class MapsPage implements OnInit {
     
     for(var i=0;i<routeItem.length;i++){
       distributorPosition = new google.maps.LatLng(routeItem[i].CoordX, routeItem[i].CoordY);
-      let content = '<h4>'+routeItem[i].DistributorName+'</h4><p>'+routeItem[i].DistributorAddress+'</p><p> Telf: '+routeItem[i].DistributorPhone+'</p><p>Stock disponible: '+this.Orders[i].OrderQuantity+' </p>';
-      this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5', content,this.Orders[i].OrderState);
+      let content = '<h4>'+routeItem[i].DistributorName+'</h4><p>'+routeItem[i].DistributorAddress+'</p><p> Telf: '+routeItem[i].DistributorPhone+'</p><p>Stock disponible: <input type="text" id="textQuantity" size="5" maxlength="3" value='+this.Orders[i].OrderQuantity+'> </p>';
+      this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5', content,this.Orders[i].OrderState,this.Orders[i].OrderId,this.nav,this.flagButton,this.Orders[i].OrderQuantity);
       //waypnts.push(distributorPosition);
     }
 
@@ -637,7 +698,7 @@ export class MapsPage implements OnInit {
 			});
       // console.log(waypnts[i]);
 		}
-
+    this.SortRoute(location,waypnts);
     console.log(waypnts);
 
     let directions_observable = env.GoogleMapsService.getDirectionsWaypoints(location, recyclerPosition, waypnts),
@@ -672,8 +733,28 @@ export class MapsPage implements OnInit {
                this.lstRoutePoint.push(env.map_model.addMilestone(this.milestone.steps[i].start_location,this.milestone.steps[i].instructions));
              }
           }
-          this.lstRoutePoint.reverse();
-          console.log("numero de hitos "+this.lstRoutePoint.length);
+
+          if(this.flaglstRoute==false)
+          {
+              if(this.OtherRoute(this.lstRoutePoint[1].marker.getPosition().lat(),this.lstRoutePointAux[1].marker.getPosition().lat(),this.lstRoutePoint[1].marker.getPosition().lng(),this.lstRoutePointAux[1].marker.getPosition().lng()))
+              {
+                  // alert("Se desvio");
+                  let data={
+                    name:this.driverName + this.driverLastName,
+                    phone:this.driverPhone
+                  }
+                  console.log(data);
+                  this.socket.emit('DeviationNotification',data);
+              }
+              else
+              {
+                  // alert("No se desvio");
+              }
+          }
+          this.flaglstRoute=false;
+
+          // this.lstRoutePoint.reverse();
+          // console.log("numero de hitos "+this.lstRoutePoint.length);
 
         },
         e => {
@@ -686,6 +767,43 @@ export class MapsPage implements OnInit {
     
 		//env.map_model.calculateAndDisplayRoute(location, recycler, waypnts);
 
+  }
+
+  SortRoute(reference,rt){
+    
+   var x1= new google.maps.LatLng(reference.lat(),reference.lng());
+   console.log("X1 "+x1);
+   var RouteInGoAux = [];
+   var i;
+   var j;
+   for (i=0; i<rt.length; i++){
+     for (j=0 ; j<rt.length - 1; j++){
+       console.log(rt[j].CoordX);
+       console.log("X1");
+       console.log(x1);
+       //console.log("new google.maps.LatLng(rt[j].CoordX,rt[j].CoordY) ");
+       console.log("Distancia 1 "+google.maps.geometry.spherical.computeDistanceBetween(x1,rt[j].location))
+       console.log("Distancia 2 "+google.maps.geometry.spherical.computeDistanceBetween(x1,rt[j+1].location))
+     if (google.maps.geometry.spherical.computeDistanceBetween(x1,rt[j].location) 
+         > google.maps.geometry.spherical.computeDistanceBetween(x1,rt[j+1].location)){
+         var temp = rt[j];
+         rt[j] = rt[j+1];
+         rt[j+1] = temp;
+         console.log("rt length "+rt.length);
+       }
+     }
+   }
+ }
+
+  OtherRoute(x1:any,x2:any,y1:any,y2:any) : Boolean
+  {
+    if(x1!=x2||y1!=y2)
+      return true;
+    else
+    {
+      //console.log("falsooo");
+      return false;
+    }
   }
 
   markMilestone(){

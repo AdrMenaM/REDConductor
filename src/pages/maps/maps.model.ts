@@ -1,3 +1,20 @@
+import { Component, NgZone,ViewChild, OnInit } from '@angular/core';
+import { NavController, LoadingController, AlertController, ToastController, PopoverController, NavParams, ViewController, Events, Content, Button, Icon, Img } from 'ionic-angular';
+import { Keyboard, Geolocation,Geoposition} from 'ionic-native';
+import { Validators, FormGroup, FormControl, FormBuilder } from '@angular/forms';
+
+import { Observable } from 'rxjs/Observable';
+
+import { GoogleMap } from "../../components/google-map/google-map";
+import { GoogleMapsService } from "./maps.service";
+
+import * as io from 'socket.io-client';
+import { Storage } from '@ionic/storage';
+import * as $ from 'jquery';
+import * as moment from 'moment';
+import { SignatureForm } from '../signatureForm/signature-form';
+import { MapsPage, PopoverPage, PopoverPageEmergency} from './maps';
+
 export class MapsModel {
   map: google.maps.Map;
 	marker: google.maps.Marker;
@@ -6,6 +23,9 @@ export class MapsModel {
     zoom: 13,
     disableDefaultUI: true
   };
+
+	socketHost: string = 'http://34.195.35.232:8080/';
+  socket:any;
 
 	map_places: Array<MapPlace> = [];
 
@@ -21,7 +41,17 @@ export class MapsModel {
 	directions_result: google.maps.DirectionsResult;
 	directions_status: google.maps.DirectionsStatus;
 	map_polyline: google.maps.Polyline;
+	// alertCtrl: AlertController
 
+
+	constructor(){
+		
+		this.socket=io.connect(this.socketHost);
+		
+	}
+
+	
+	
   // directionsDisplay = new google.maps.DirectionsRenderer({
   //           map: this.map
   //       })
@@ -73,34 +103,132 @@ export class MapsModel {
 
 		return _map_place;
 	}
-	addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: string, state:string) : MapPlace {
+addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: string, state:string, num_order:number, nav:NavController,flagButton: boolean, orderQty:any) : MapPlace {
 		let _map_place = new MapPlace();
-
+		
+		//<ion-icon name="clipboard"></ion-icon>
+		let buttonConfirmSign=`<ion-grid>
+          <ion-row>
+            <ion-col>
+              <button id="ButtonConfirm" style="color:white;background-color:#D3170B">
+                <div>
+                  <ion-grid>
+                    <ion-row>
+                      <ion-col>
+                       
+                      </ion-col>
+                      <ion-col>
+                        <label>CONFIRMAR</label>
+                        
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </div>
+              </button>
+            </ion-col>
+            <ion-col>
+              <button id="ButtonSign" *ngIf="flagButton" style="color:white;background-color:#D3170B">
+                  <div>
+                  <ion-grid>
+                    <ion-row>
+                      <ion-col>
+                    <ion-icon name="create"></ion-icon>
+                    </ion-col>
+                      <ion-col>
+                    <label>FIRMAR</label>
+                    </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                  </div>
+              </button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>`;
 		_map_place.location = location;
 		if(state=="Completado"){
 			_map_place.marker = new google.maps.Marker({
 				position: location,
 				map: this.map,
 				icon: './assets/images/maps/dListo.png',
-			
+				/*title:[
+						buttonConfirmSign.toString()
+				].join(""),*/
     	});
 		}else{
 		_map_place.marker = new google.maps.Marker({
       position: location,
       map: this.map,
       icon: './assets/images/maps/dPendiente.png',
-			
+			/*title:[
+						buttonConfirmSign.toString()
+				].join(""),*/
     });
-		}
-		
-		_map_place.marker.addListener('click', ()=>{let infoWindow = new google.maps.InfoWindow({content: contnt}); infoWindow.open(_map_place.marker.get('map'), _map_place.marker) });
+		var infoWindow = new google.maps.InfoWindow({content: contnt}); //infoWindow.open(_map_place.marker.get('map'), _map_place.marker);
+		//_map_place.marker.addListener('click', ()=>{let infoWindow = new google.maps.InfoWindow({content: ""}); infoWindow.open(_map_place.marker.get('map'), _map_place.marker) });
+		_map_place.marker.addListener('click',()=>{
+			//this.map_page.sendPosition();
+			infoWindow.open(_map_place.marker.get('map'), _map_place.marker);//alert('hola2')
+			
+			if(flagButton==true)
+			{
+				infoWindow.setContent(contnt+buttonConfirmSign);
+			}
+			else
+			{
+				alert("esta lejos");
+				infoWindow.setContent(contnt);
+			}
+		});
+		google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+			var btnSign,btnConfirm;
 
+			btnSign=document.getElementById('ButtonSign');
+			if(btnSign)
+			{
+							btnSign.addEventListener('click', () => {
+							//alert(num_order);
+							this.goToSignaturePad(num_order,nav);
+						});
+			}			
+	  	btnConfirm=document.getElementById('ButtonConfirm');
+			if(btnConfirm)
+			{
+				btnConfirm.addEventListener('click', () => {
+//////////////////////////////////////////////////////////////////////
+				
+
+
+///////////////////////////////////////////////////////////////////////
+
+				var cantidad,cant;
+										cantidad=document.getElementById('textQuantity');
+										
+										if(cantidad)
+										{
+											// 	alert("Si encontro");
+												cant=$('#textQuantity').val();
+										}
+										
+										let data={orderid:num_order,quantity:cant};
+										//alert(data.orderid+" "+data.quantity);
+										this.socket.emit('UpdateOrderQuantity',data);
+					orderQty=cant;
+
+					alert("Cantidad confirmada");
+					
+      	});
+			}		
+						// $('input#textQuantity').on('change',function(){
+    				// 	var valor = $(this).val();
+   					//  	alert(valor);
+						// });
+						
+		});
+		//HTMLDocument.getElementById("firmar").addEventListener('click',function(){infoWindow.getPosition()});
 		this.map_places.push(_map_place);
 		
-
 		return _map_place;
-	}
-
+	}}
 	addRecyclingCenter(location: google.maps.LatLng, color: string = '#333333', contnt: string) : MapPlace {
 		let _map_place = new MapPlace();
 
@@ -120,6 +248,11 @@ export class MapsModel {
 
 		return _map_place;
 	}
+
+	goToSignaturePad( orderId: any, nav:NavController){
+    
+		nav.push(SignatureForm, {OrderId: orderId});
+  }
 
 	addMilestone(location: google.maps.LatLng, contnt: string) : MapPlace {
 		let _map_place = new MapPlace();

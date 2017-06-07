@@ -96,7 +96,13 @@ export class ListingPage {
       // console.log(data.length);
       this.JourneyRoute=data[data.length-1];
       // console.log(this.JourneyRoute.JourneyId);
-      this.socket.emit('RequestJourneyOrders',this.JourneyRoute.JourneyId);
+      if(this.JourneyRoute!=null){
+        this.socket.emit('RequestJourneyOrders',this.JourneyRoute.JourneyId);
+      }
+      else{
+        alert("No tiene viajes asignados");
+      }
+      
     })
     // var JournId=this.JourneyRoute.JourneyId;
     // alert("journeyID:"+JournId);

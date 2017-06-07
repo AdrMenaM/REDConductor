@@ -145,12 +145,7 @@
                             "count": 1
                         }
                     ],
-                    "UIBackgroundModes": [
-                        {
-                            "xml": "<array><string>remote-notification</string></array>",
-                            "count": 1
-                        }
-                    ],
+                    "UIBackgroundModes": [],
                     "GCM_SENDER_ID": [
                         {
                             "xml": "<string>737509012599</string>",

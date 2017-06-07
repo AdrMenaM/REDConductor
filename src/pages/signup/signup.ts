@@ -13,6 +13,8 @@ import * as io from 'socket.io-client';
 import { Storage } from '@ionic/storage';
 import * as $ from 'jquery';
 
+import { Auth, User, UserDetails, IDetailedError } from '@ionic/cloud-angular';
+
 @Component({
   selector: 'signup-page',
   templateUrl: 'signup.html'
@@ -26,6 +28,8 @@ export class SignupPage {
   lstUsers: any=[];
   maxlengt: any;
   errorMsg: any;
+  email:string;
+  passwd:string;
   // enabledCi: boolean;
   constructor(
     public nav: NavController,
@@ -35,7 +39,9 @@ export class SignupPage {
     public loadingCtrl: LoadingController,
     public toastCtrl: ToastController,
     public storage: Storage,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    public auth: Auth,
+    public user: User
   ) {
     this.signup = new FormGroup({
       rdbciruc: new FormControl('rdbci'),
@@ -162,6 +168,21 @@ export class SignupPage {
                           
                     });
                 toast.present();
+                this.email=NewUser.email;
+                this.passwd=NewUser.pass;
+                let details: UserDetails = {'email': this.email, 'password': this.passwd};
+
+                this.auth.signup(details).then(() => {
+                  // `this.user` is now registered
+                }, (err: IDetailedError<string[]>) => {
+                  for (let e of err.details) {
+                    if (e === 'conflict_email') {
+                      alert('El correo ingresado ya existe.');
+                    } else {
+                      // handle other errors
+                    }
+                  }
+                });
             }else{
                 let env = this;
                 let toast = env.toastCtrl.create({

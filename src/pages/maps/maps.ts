@@ -184,6 +184,8 @@ export class MapsPage implements OnInit {
   driverName:any;
   driverPhone:any;
   driverLastName:any;
+  flagflag: boolean;
+  routeItem:any=[];
 
   // Fin manejo socket
   map_model: MapsModel;
@@ -199,6 +201,8 @@ export class MapsPage implements OnInit {
     this.socket=io.connect(this.socketHost);
     this.zone= new NgZone({enableLongStackTrace: false});
     this.geolocateMe();
+
+    this.flagflag=true;
     // this.storage.get('person').then((aux)=>{
     //   this.ShowJourney(aux)
     // })
@@ -270,7 +274,19 @@ export class MapsPage implements OnInit {
       _loading.dismiss();
     });
     this.socketUpdate();
-    // this.ShowJourney();    
+    this.flagflag=true;
+    // this.ShowJourney(); 
+    // for(var i = 0; i < this.lstDistributors.length; i++){
+    //   for(var j=0;j<this.Orders.length;j++){
+    //     // this.lstDistributors[i].DistributorId==route[j]
+    //     if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+          
+    //       this.routeItem.push(this.lstDistributors[i]);
+    //     }    
+    //     }
+    //   }  
+
+    //   this.routeItem.reverse(); 
   }
   
   ionViewDidEnter() {
@@ -301,10 +317,12 @@ export class MapsPage implements OnInit {
 
   beginJourney(){
 
-    var routeItem=[];
+    // var routeItem=[];
     var orderItem=[];
     var distributorPosition;
-    this.socketUpdate();
+    var registrandoPosicion=false;
+    
+    // this.socketUpdate();
 
     if($('#btnBeginJourney').text()!="Pausar"){
       $('#btnBeginJourney').text("Pausar");
@@ -314,7 +332,7 @@ export class MapsPage implements OnInit {
         // this.lstDistributors[i].DistributorId==route[j]
         if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
           
-          routeItem.push(this.lstDistributors[i]);
+          this.routeItem.push(this.lstDistributors[i]);
           if(this.Orders[j].OrderState=="En Proceso"){
             orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
             }
@@ -323,31 +341,68 @@ export class MapsPage implements OnInit {
         }
       }
 
-      routeItem.reverse();
+      
+
+      this.routeItem.reverse(); 
+
+      // console.log(routeItem.reverse());
       
       this.userMarker.marker.setIcon('./assets/images/maps/truckS.png');
+       
        this.watch=Geolocation.watchPosition({enableHighAccuracy: true,maximumAge: 30000}).subscribe((position: Geoposition)=>{
+        
         var ultimaPosicion = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
               this.userMarker.marker.setPosition(ultimaPosicion);
             var info={
               position: ultimaPosicion,
               user: this.current_user
             }
+
+            // let penultimaPosicion=ultimaPosicion;
+            //   if(google.maps.geometry.spherical.computeDistanceBetween(ultimaPosicion,distributorPosition) < 20){
+
+            //   }
+
+// /////////////////////////////////////////////////////////////////////////////////////
+
+      if(!registrandoPosicion){
+              registrandoPosicion=true;
+              ultimaPosicion = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+               
+             }else{
+              
+              
+               var posicionActual = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+               if (google.maps.geometry.spherical.computeDistanceBetween(posicionActual, ultimaPosicion) > 20) { 
+                 
+                 ultimaPosicion = posicionActual;
+                  this.userMarker.marker.setPosition(posicionActual);
+
+                  this.sendPosition(ultimaPosicion);
+                 
+                  //  distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
+                  //   if(google.maps.geometry.spherical.computeDistanceBetween(ultimaPosicion,distributorPosition) < 300){
+                  //     this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
+                  //     routeItem.pop();
+           
+                    // }
+                  // Manejo socket
+                  // console.log("apptrucklocation"+info);
+                  this.socket=io.connect(this.socketHost);
+                  this.zone= new NgZone({enableLongStackTrace: false});
+                  this.socket.emit('AppTruckLocation',info);
+                  this.markMilestone();
+                  // Fin Manejo socket
+               }
+              
+      }
+
+// /////////////////////////////////////////////////////////////////////////////
               
 
-              distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
-              if(google.maps.geometry.spherical.computeDistanceBetween(ultimaPosicion,distributorPosition) < 300){
-                this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
-                routeItem.pop();
-      //waypnts.push(distributorPosition);
-            }
-            // Manejo socket
-            // console.log("apptrucklocation"+info);
-            this.socket=io.connect(this.socketHost);
-            this.zone= new NgZone({enableLongStackTrace: false});
-            this.socket.emit('AppTruckLocation',info);
-            this.markMilestone();
-            // Fin Manejo socket
+              
+
+             
       });
       
     }else{
@@ -385,7 +440,13 @@ export class MapsPage implements OnInit {
       console.log('Bienvenido: '+ user.USEREMAIL);
     });
 
-    this.flaglstRoute=true;
+     if(this.flagflag==true)
+    {
+      this.flaglstRoute=true;
+      this.flagflag=false;
+    }
+
+    this.lstRoutePointAux=this.lstRoutePoint;
 
     this.ShowJourney(location);
 
@@ -420,7 +481,7 @@ export class MapsPage implements OnInit {
     // );
   }
 
-  sendPosition(){
+  sendPosition(posactual: google.maps.LatLng){
     // var routeItem=[];
     // var orderItem=[];
     // var distributorPosition;
@@ -459,7 +520,7 @@ export class MapsPage implements OnInit {
     //         this.socket.emit('AppTruckLocation',info);
     this.lstRoutePointAux=this.lstRoutePoint;
     //console.log(this.lstRoutePointAux.length);
-    var routeItem=[];
+    
     var orderItem=[];
     var distributorPosition;
     this.flagButton=false;
@@ -468,7 +529,7 @@ export class MapsPage implements OnInit {
         // this.lstDistributors[i].DistributorId==route[j]
         if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
           
-          routeItem.push(this.lstDistributors[i]);
+          this.routeItem.push(this.lstDistributors[i]);
           if(this.Orders[j].OrderState=="En Proceso"){
             orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
             }
@@ -477,26 +538,125 @@ export class MapsPage implements OnInit {
         }
       }
 
-      routeItem.reverse();
+      this.routeItem.reverse();
 
     //console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
     var info={
-              position: this.userMarker.marker.getPosition(),
+              // position: this.userMarker.marker.getPosition(),
+              position: posactual,
               user: this.current_user
             }
 
-            distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
+            distributorPosition = new google.maps.LatLng(this.routeItem[this.routeItem.length-1].CoordX, this.routeItem[this.routeItem.length-1].CoordY);
               if(google.maps.geometry.spherical.computeDistanceBetween(info.position,distributorPosition) < 300){
                 this.flagButton=true;
                 console.log(this.flagButton);
-                this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
-                routeItem.pop();
+                this.socket.emit('NearNotification',this.routeItem[this.routeItem.length-1].DistributorName);
+                this.routeItem.pop();
       //waypnts.push(distributorPosition);
               }else
               {
                 console.log(this.flagButton);
               }
-            this.ShowJourney(info.position);
+            this.socketUpdate();
+            //this.ShowJourney(info.position);
+            this.setOrigin(info.position);
+
+
+            // this.socket=io.connect(this.socketHost);
+            // this.zone= new NgZone({enableLongStackTrace: false});
+            this.socket.emit('AppTruckLocation',info);
+           
+    
+  }
+
+
+  sendPosition1(){
+    // var routeItem=[];
+    // var orderItem=[];
+    // var distributorPosition;
+    // for(var i = 0; i < this.lstDistributors.length; i++){
+    //   for(var j=0;j<this.Orders.length;j++){
+    //     // this.lstDistributors[i].DistributorId==route[j]
+    //     if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+          
+    //       routeItem.push(this.lstDistributors[i]);
+    //       if(this.Orders[j].OrderState=="En Proceso"){
+    //         orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
+    //         }
+    //       }     
+
+    //     }
+    //   }
+
+    //   routeItem.reverse();
+
+    // console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
+    // var info={
+    //           position: this.userMarker.marker.getPosition(),
+    //           user: this.current_user
+    //         }
+
+    //         distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
+    //           if(google.maps.geometry.spherical.computeDistanceBetween(info.position,distributorPosition) < 300){
+    //             this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
+    //             routeItem.pop();
+    //   //waypnts.push(distributorPosition);
+    //         }
+
+    //         // this.socket=io.connect(this.socketHost);
+    //         // this.zone= new NgZone({enableLongStackTrace: false});
+    //         this.markMilestone();
+    //         this.socket.emit('AppTruckLocation',info);
+    this.lstRoutePointAux=this.lstRoutePoint;
+    //console.log(this.lstRoutePointAux.length);
+    
+    var orderItem=[];
+    var distributorPosition;
+    this.flagButton=false;
+    // for(var i = 0; i < this.lstDistributors.length; i++){
+    //   for(var j=0;j<this.Orders.length;j++){
+    //     // this.lstDistributors[i].DistributorId==route[j]
+    //     if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+          
+    //       routeItem.push(this.lstDistributors[i]);
+    //       if(this.Orders[j].OrderState=="En Proceso"){
+    //         orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
+    //         }
+    //       }     
+
+    //     }
+    //   }
+
+      // console.log(routeItem.reverse());
+
+    //console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
+    var info={
+              position: this.userMarker.marker.getPosition(),
+              // position: posactual,
+              user: this.current_user
+            }
+
+            if(this.routeItem.length!=0){
+              distributorPosition = new google.maps.LatLng(this.routeItem[this.routeItem.length-1].CoordX, this.routeItem[this.routeItem.length-1].CoordY);
+              if(google.maps.geometry.spherical.computeDistanceBetween(info.position,distributorPosition) < 300){
+                
+                this.flagButton=true;
+                //console.log(this.flagButton);
+                this.socket.emit('NearNotification',this.routeItem[this.routeItem.length-1].DistributorName);
+                console.log(this.routeItem.pop());
+      //waypnts.push(distributorPosition);
+              }else
+              {
+                console.log(this.flagButton);
+              }
+              
+            }
+            
+            this.socketUpdate();
+            //this.ShowJourney(info.position);
+            this.setOrigin(info.position);
+
 
             // this.socket=io.connect(this.socketHost);
             // this.zone= new NgZone({enableLongStackTrace: false});
@@ -596,9 +756,198 @@ export class MapsPage implements OnInit {
     }
   }
 
+  // ShowJourney(location: google.maps.LatLng){
+  //   let env=this;
+  //   //let bound = new google.maps.LatLngBounds();
+  //   var route;
+  //   var recyclerId;
+  //   var recycler;
+  //   var routeItem=[];
+  //   var orderItem=[];
+  //   var routeItemOrder=[];
+  //   this.Orders=[];
+  //   // var Orders=[];
+  //   var waypnts=[];
+
+  //   var ObjJourney;
+  //   ObjJourney=this.lstJourneys[0];
+    
+  //   for (var j = 0; j < this.lstActiveOrders.length; j++) {
+  //     if(this.lstActiveOrders[j].JourneyId==this.JourneyRoute.JourneyId){
+  //       this.Orders.push(this.lstActiveOrders[j]);
+  //     }	  
+  //   }
+  //   console.log(this.Orders);
+
+  //   recyclerId=this.JourneyRoute.recyclingcenterid;
+  //   route=this.JourneyRoute.JourneyRoute.split(',');
+  //   //alert(route.length);
+
+  //   console.log(route.length);
+  //   var distributorPosition;
+  //   // var distributorPosition1 = new google.maps.LatLng(this.lstDistributors[0].CoordX, this.lstDistributors[0].CoordY);
+  //   //bound.extend(distributorPosition);
+  //   // var limits = new google.maps.LatLngBounds(distributorPosition,location);
+  //   // env.map_model.map.fitBounds(limits);
+  //       env.map_model.map.setCenter(location);
+  //       env.map_model.map.setZoom(11);
+  //   // limits.extend(current_location);
+  //     // for(var j=0;j<this.lstActiveOrders.length;j++){
+  //     //   if(this.lstActiveOrders[j].JourneyId==this.lstJourneys[i].JourneyId){
+  //     //     Orders.push(this.lstActiveOrders[j]);
+  //     //   }
+  //     // }
+  //   // for(var i=0;i<this.lstDistributors.length;i++){
+  //   //   distributorPosition = new google.maps.LatLng(this.lstDistributors[i].CoordX, this.lstDistributors[i].CoordY);
+  //   //   this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5');
+  //   // }
+      
+  //   for(var i = 0; i < this.lstDistributors.length; i++){
+  //     for(var j=0;j<this.Orders.length;j++){
+  //       // this.lstDistributors[i].DistributorId==route[j]
+  //       if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+          
+  //         routeItem.push(this.lstDistributors[i]);
+  //         if(this.Orders[j].OrderState=="En Proceso"){
+  //           orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
+  //         }
+  //       }     
+        
+  //       //Obtener ordenes con estado En proceso
+
+  //       // for (var k = 0; k < Orders.length; k++) {
+ 	// 			// 	if(this.lstDistributors[i].DistributorId==Orders[k].DistributorId){
+ 	// 			// 		routeItemOrder.push(Orders[k].OrderQuantity)
+ 	// 			// 	}
+ 	// 		  // }
+  //     }
+  //   }
+  //             console.log(orderItem);
+
+  //   for(var i=0;i<this.lstRecyclingCenters.length;i++){
+  //     if(this.lstRecyclingCenters[i].RecyclingCenterId==recyclerId){
+  //         recycler=this.lstRecyclingCenters[i];
+  //       }
+  //   }
+
+    
+  //   for(var i=0;i<routeItem.length;i++){
+  //     distributorPosition = new google.maps.LatLng(routeItem[i].CoordX, routeItem[i].CoordY);
+  //     let content = '<h4>'+routeItem[i].DistributorName+'</h4><p>'+routeItem[i].DistributorAddress+'</p><p> Telf: '+routeItem[i].DistributorPhone+'</p><p>Stock disponible: <input type="text" id="textQuantity" size="5" maxlength="3" value='+this.Orders[i].OrderQuantity+'> </p>';
+  //     this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5', content,this.Orders[i].OrderState,this.Orders[i].OrderId,this.nav,this.flagButton,this.Orders[i].OrderQuantity);
+  //     //waypnts.push(distributorPosition);
+  //   }
+
+  //   // for(var i=0;i<orderItem.length;i++){
+  //   //   distributorPosition = new google.maps.LatLng(orderItem[i].CoordX, orderItem[i].CoordY);
+  //   //   let content = '<h4>'+orderItem[i].DistributorName+'</h4><p>'+orderItem[i].DistributorAddress+'</p><p> Telf: '+orderItem[i].DistributorPhone+'</p><p>Stock disponible: '+this.Orders[i].OrderQuantity+' </p>';
+  //   //   this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5', content,"Completado");
+  //   //   //waypnts.push(distributorPosition);
+  //   // }
+
+  //     var recyclerPosition=new google.maps.LatLng(recycler.CoordX, recycler.CoordY);
+  //     let recyclerContent='<h4>'+recycler.RecyclingCenterName+'</h4><p>'+recycler.RecyclingCenterAddress+'</p><p> Telf: '+recycler.RecyclingCenterPhone+'</p>';
+  //     var recyclerMarker = env.map_model.addRecyclingCenter(recyclerPosition, '#00e9d5', recyclerContent);
+
+  //   //====================================================================================
+  //   for (var i = 0; i < orderItem.length; i++) {
+      
+	// 		waypnts.push({
+	// 			location: new google.maps.LatLng(orderItem[i].CoordX,orderItem[i].CoordY),
+	// 			stopover: true 
+	// 		});
+  //     // console.log(waypnts[i]);
+	// 	}
+  //   this.SortRoute(location,waypnts);
+  //   console.log(waypnts);
+
+  //   let directions_observable = env.GoogleMapsService.getDirectionsWaypoints(location, recyclerPosition, waypnts),
+  //       distance_observable = env.GoogleMapsService.getDistanceMatrix(location, recyclerPosition);
+
+  //    Observable.forkJoin(directions_observable, distance_observable).subscribe(
+  //       data => {
+  //         let directions = data[0],
+  //             // distance1 = data[1].rows[0].elements[0].distance.text,
+  //             distance=data[0].routes[0].legs[0].distance.text,            
+  //             //distance2= data[1].rows[0].elements[0].distance.text,         
+  //             duration = data[0].routes[0].legs[0].duration.text;
+  //             for(var i=0;i<data[0].routes[0].legs[0].steps.length;i++){
+  //               var cad=data[0].routes[0].legs[0].steps[i].instructions;
+  //               while(cad.includes("<b>")==true)
+  //               {
+  //                   cad=cad.replace("<b>","");
+  //               }  
+  //               while(cad.includes("</b>")==true)
+  //               {
+  //                   cad=cad.replace("</b>","");
+  //               } 
+  //               //console.log(cad+" "+i);
+  //               //this.steps.push(data[0].routes[0].legs[0].steps[i].instructions);
+  //               this.steps.push(cad);
+  //             }
+
+  //         env.map_model.directions_display.setDirections(directions);
+  //         // env.map_model.map.setOptions()
+          
+  //         let toast = env.toastCtrl.create({
+  //               message: 'La distancia es '+distance+' y le tomará '+duration,
+  //               duration: 5000
+  //             });
+  //         toast.present();
+  //         console.log(this.steps);
+  //         //this.presentPopover(steps) ;
+  //         this.lstRoutePoint=[]; 
+  //         this.numMilestone = data[0].routes[0];
+  //         for (var j = 0; j < this.numMilestone.legs.length; j++) {
+  //           this.milestone = data[0].routes[0].legs[j];
+  //            for (var i = 0; i < this.milestone.steps.length; i++) {
+  //              this.lstRoutePoint.push(env.map_model.addMilestone(this.milestone.steps[i].start_location,this.milestone.steps[i].instructions));
+  //            }
+  //         }
+
+  //         if(this.flaglstRoute==false)
+  //         {
+  //             if(this.OtherRoute(this.lstRoutePoint[1].marker.getPosition().lat(),this.lstRoutePointAux[1].marker.getPosition().lat(),this.lstRoutePoint[1].marker.getPosition().lng(),this.lstRoutePointAux[1].marker.getPosition().lng()))
+  //             {
+  //                 // alert("Se desvio");
+  //                 let data={
+  //                   name:this.driverName + this.driverLastName,
+  //                   phone:this.driverPhone
+  //                 }
+  //                 console.log(data);
+  //                 this.socket.emit('DeviationNotification',data);
+  //             }
+  //             else
+  //             {
+  //                 // alert("No se desvio");
+  //             }
+  //         }
+  //         this.flaglstRoute=false;
+
+  //         // this.lstRoutePoint.reverse();
+  //         // console.log("numero de hitos "+this.lstRoutePoint.length);
+
+  //       },
+  //       e => {
+  //         console.log('onError: %s', e);
+  //       },
+  //       () => {
+  //         console.log('onCompleted');
+  //       }
+  //     );
+    
+	// 	//env.map_model.calculateAndDisplayRoute(location, recycler, waypnts);
+
+  // }
+
   ShowJourney(location: google.maps.LatLng){
+    //this.socketUpdate();
+    //this.socketUpdate();
     let env=this;
+    
+    
     //let bound = new google.maps.LatLngBounds();
+    
     var route;
     var recyclerId;
     var recycler;
@@ -608,10 +957,10 @@ export class MapsPage implements OnInit {
     this.Orders=[];
     // var Orders=[];
     var waypnts=[];
-
     var ObjJourney;
-    ObjJourney=this.lstJourneys[0];
     
+    ObjJourney=this.lstJourneys[0];
+    this.socketUpdate();
     for (var j = 0; j < this.lstActiveOrders.length; j++) {
       if(this.lstActiveOrders[j].JourneyId==this.JourneyRoute.JourneyId){
         this.Orders.push(this.lstActiveOrders[j]);
@@ -662,7 +1011,7 @@ export class MapsPage implements OnInit {
  			  // }
       }
     }
-              console.log(orderItem);
+              //console.log(orderItem);
 
     for(var i=0;i<this.lstRecyclingCenters.length;i++){
       if(this.lstRecyclingCenters[i].RecyclingCenterId==recyclerId){
@@ -672,12 +1021,24 @@ export class MapsPage implements OnInit {
 
     
     for(var i=0;i<routeItem.length;i++){
-      distributorPosition = new google.maps.LatLng(routeItem[i].CoordX, routeItem[i].CoordY);
+      distributorPosition = new google.maps.LatLng(routeItem[i].CoordX, routeItem[i].CoordY);           
+      // alert(this.Orders[i].OrderQuantity);
       let content = '<h4>'+routeItem[i].DistributorName+'</h4><p>'+routeItem[i].DistributorAddress+'</p><p> Telf: '+routeItem[i].DistributorPhone+'</p><p>Stock disponible: <input type="text" id="textQuantity" size="5" maxlength="3" value='+this.Orders[i].OrderQuantity+'> </p>';
-      this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5', content,this.Orders[i].OrderState,this.Orders[i].OrderId,this.nav,this.flagButton,this.Orders[i].OrderQuantity);
+      //this.sendPosition();
+      //var bandera=this.flagButton;
+      //alert(bandera+" Antes de arreglo");
+      
+      this.distributorMarker[i] = env.map_model.addPlaceToMap(distributorPosition, '#00e9d5', content,this.Orders[i],this.nav,this.flagButton);
+      
       //waypnts.push(distributorPosition);
     }
-
+    
+    // alert(this.flagConfirm);
+    // if(this.flagConfirm==true)
+    // {
+    //   this.socketUpdate();
+    //   this.flagConfirm=false;
+    // }
     // for(var i=0;i<orderItem.length;i++){
     //   distributorPosition = new google.maps.LatLng(orderItem[i].CoordX, orderItem[i].CoordY);
     //   let content = '<h4>'+orderItem[i].DistributorName+'</h4><p>'+orderItem[i].DistributorAddress+'</p><p> Telf: '+orderItem[i].DistributorPhone+'</p><p>Stock disponible: '+this.Orders[i].OrderQuantity+' </p>';
@@ -694,16 +1055,17 @@ export class MapsPage implements OnInit {
       
 			waypnts.push({
 				location: new google.maps.LatLng(orderItem[i].CoordX,orderItem[i].CoordY),
-				stopover: true 
+				stopover: false 
 			});
       // console.log(waypnts[i]);
 		}
+    console.log(location.lat()+" "+location.lng());
     this.SortRoute(location,waypnts);
-    console.log(waypnts);
+    //console.log(waypnts);
 
     let directions_observable = env.GoogleMapsService.getDirectionsWaypoints(location, recyclerPosition, waypnts),
         distance_observable = env.GoogleMapsService.getDistanceMatrix(location, recyclerPosition);
-
+    
      Observable.forkJoin(directions_observable, distance_observable).subscribe(
         data => {
           let directions = data[0],
@@ -712,7 +1074,18 @@ export class MapsPage implements OnInit {
               //distance2= data[1].rows[0].elements[0].distance.text,         
               duration = data[0].routes[0].legs[0].duration.text;
               for(var i=0;i<data[0].routes[0].legs[0].steps.length;i++){
-                this.steps.push(data[0].routes[0].legs[0].steps[i].instructions); 
+                var cad=data[0].routes[0].legs[0].steps[i].instructions;
+                while(cad.includes("<b>")==true)
+                {
+                    cad=cad.replace("<b>","");
+                }  
+                while(cad.includes("</b>")==true)
+                {
+                    cad=cad.replace("</b>","");
+                } 
+                //console.log(cad+" "+i);
+                //this.steps.push(data[0].routes[0].legs[0].steps[i].instructions);
+                this.steps.push(cad);
               }
 
           env.map_model.directions_display.setDirections(directions);
@@ -723,16 +1096,18 @@ export class MapsPage implements OnInit {
                 duration: 5000
               });
           toast.present();
-          console.log(this.steps);
+          //console.log(this.steps);
           //this.presentPopover(steps) ;
           this.lstRoutePoint=[]; 
           this.numMilestone = data[0].routes[0];
           for (var j = 0; j < this.numMilestone.legs.length; j++) {
-            this.milestone = data[0].routes[0].legs[j];
+            this.milestone = data[0].routes[0].legs[j]; //Lista de puntos de control 
              for (var i = 0; i < this.milestone.steps.length; i++) {
                this.lstRoutePoint.push(env.map_model.addMilestone(this.milestone.steps[i].start_location,this.milestone.steps[i].instructions));
+               
              }
           }
+
 
           if(this.flaglstRoute==false)
           {
@@ -752,10 +1127,6 @@ export class MapsPage implements OnInit {
               }
           }
           this.flaglstRoute=false;
-
-          // this.lstRoutePoint.reverse();
-          // console.log("numero de hitos "+this.lstRoutePoint.length);
-
         },
         e => {
           console.log('onError: %s', e);
@@ -766,8 +1137,10 @@ export class MapsPage implements OnInit {
       );
     
 		//env.map_model.calculateAndDisplayRoute(location, recycler, waypnts);
-
+    
   }
+
+  
 
   SortRoute(reference,rt){
     

@@ -104,6 +104,13 @@ module.exports = [
         "runs": true
     },
     {
+        "file": "plugins/onesignal-cordova-plugin/www/OneSignal.js",
+        "id": "onesignal-cordova-plugin.OneSignal",
+        "clobbers": [
+            "OneSignal"
+        ]
+    },
+    {
         "file": "plugins/phonegap-plugin-push/www/push.js",
         "id": "phonegap-plugin-push.PushNotification",
         "clobbers": [
@@ -129,6 +136,7 @@ module.exports.metadata =
     "cordova-plugin-x-socialsharing": "5.1.6",
     "cordova-plugin-x-toast": "2.6.0",
     "ionic-plugin-keyboard": "2.2.1",
+    "onesignal-cordova-plugin": "2.1.1",
     "phonegap-plugin-push": "1.8.4"
 };
 // BOTTOM OF METADATA

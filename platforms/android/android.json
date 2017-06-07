@@ -89,6 +89,10 @@
                             "count": 1
                         },
                         {
+                            "xml": "<feature name=\"OneSignalPush\"><param name=\"android-package\" value=\"com.plugin.gcm.OneSignalPush\" /></feature>",
+                            "count": 1
+                        },
+                        {
                             "xml": "<feature name=\"PushNotification\"><param name=\"android-package\" value=\"com.adobe.phonegap.push.PushPlugin\" /></feature>",
                             "count": 1
                         }
@@ -147,6 +151,18 @@
                             "count": 1
                         },
                         {
+                            "xml": "<uses-permission android:name=\"com.amazon.device.messaging.permission.RECEIVE\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<permission android:name=\"com.b2red.app.permission.RECEIVE_ADM_MESSAGE\" android:protectionLevel=\"signature\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"com.b2red.app.permission.RECEIVE_ADM_MESSAGE\" />",
+                            "count": 1
+                        },
+                        {
                             "xml": "<uses-permission android:name=\"android.permission.INTERNET\" />",
                             "count": 1
                         },
@@ -178,6 +194,18 @@
                     "/manifest/application": [
                         {
                             "xml": "<provider android:authorities=\"com.b2red.app.sharing.provider\" android:exported=\"false\" android:grantUriPermissions=\"true\" android:name=\"nl.xservices.plugins.FileProvider\"><meta-data android:name=\"android.support.FILE_PROVIDER_PATHS\" android:resource=\"@xml/sharing_paths\" /></provider>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<amazon:enable-feature android:name=\"com.amazon.device.messaging\" android:required=\"false\" xmlns:amazon=\"http://schemas.amazon.com/apk/res/android\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<service android:exported=\"false\" android:name=\"com.onesignal.ADMMessageHandler\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<receiver android:name=\"com.onesignal.ADMMessageHandler$Receiver\" android:permission=\"com.amazon.device.messaging.permission.SEND\"><intent-filter><action android:name=\"com.amazon.device.messaging.intent.REGISTRATION\" /><action android:name=\"com.amazon.device.messaging.intent.RECEIVE\" /><category android:name=\"com.b2red.app\" /></intent-filter></receiver>",
                             "count": 1
                         },
                         {
@@ -279,6 +307,9 @@
             "PACKAGE_NAME": "com.b2red.app"
         },
         "ionic-plugin-keyboard": {
+            "PACKAGE_NAME": "com.b2red.app"
+        },
+        "onesignal-cordova-plugin": {
             "PACKAGE_NAME": "com.b2red.app"
         },
         "phonegap-plugin-push": {
@@ -392,6 +423,13 @@
             "runs": true
         },
         {
+            "file": "plugins/onesignal-cordova-plugin/www/OneSignal.js",
+            "id": "onesignal-cordova-plugin.OneSignal",
+            "clobbers": [
+                "OneSignal"
+            ]
+        },
+        {
             "file": "plugins/phonegap-plugin-push/www/push.js",
             "id": "phonegap-plugin-push.PushNotification",
             "clobbers": [
@@ -415,6 +453,7 @@
         "cordova-plugin-x-socialsharing": "5.1.6",
         "cordova-plugin-x-toast": "2.6.0",
         "ionic-plugin-keyboard": "2.2.1",
+        "onesignal-cordova-plugin": "2.1.1",
         "phonegap-plugin-push": "1.8.4"
     }
 }

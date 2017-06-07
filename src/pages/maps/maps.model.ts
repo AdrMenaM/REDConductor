@@ -103,7 +103,7 @@ export class MapsModel {
 
 		return _map_place;
 	}
-addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: string, state:string, num_order:number, nav:NavController,flagButton: boolean, orderQty:any) : MapPlace {
+addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: string, order:any, nav:NavController, flagButton: boolean) : MapPlace {
 		let _map_place = new MapPlace();
 		
 		//<ion-icon name="clipboard"></ion-icon>
@@ -145,7 +145,7 @@ addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: s
           </ion-row>
         </ion-grid>`;
 		_map_place.location = location;
-		if(state=="Completado"){
+		if(order.OrderState=="Completado"){
 			_map_place.marker = new google.maps.Marker({
 				position: location,
 				map: this.map,
@@ -169,13 +169,13 @@ addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: s
 			//this.map_page.sendPosition();
 			infoWindow.open(_map_place.marker.get('map'), _map_place.marker);//alert('hola2')
 			
-			if(flagButton==true)
+			if(order.OrderState!="Completado")
 			{
 				infoWindow.setContent(contnt+buttonConfirmSign);
 			}
 			else
 			{
-				alert("esta lejos");
+				// alert("esta lejos");
 				infoWindow.setContent(contnt);
 			}
 		});
@@ -187,7 +187,7 @@ addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: s
 			{
 							btnSign.addEventListener('click', () => {
 							//alert(num_order);
-							this.goToSignaturePad(num_order,nav);
+							this.goToSignaturePad(order.OrderId,nav);
 						});
 			}			
 	  	btnConfirm=document.getElementById('ButtonConfirm');
@@ -209,10 +209,10 @@ addPlaceToMap(location: google.maps.LatLng, color: string = '#333333', contnt: s
 												cant=$('#textQuantity').val();
 										}
 										
-										let data={orderid:num_order,quantity:cant};
+										let data={orderid:order.OrderId,quantity:cant};
 										//alert(data.orderid+" "+data.quantity);
 										this.socket.emit('UpdateOrderQuantity',data);
-					orderQty=cant;
+					// orderQty=cant;
 
 					alert("Cantidad confirmada");
 					

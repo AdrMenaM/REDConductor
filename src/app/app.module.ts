@@ -66,7 +66,7 @@ import { Storage } from '@ionic/storage';
 
 import { SignaturePadModule } from 'angular2-signaturepad';
 
-import {OneSignal} from '@ionic-native/onesignal';
+// import {OneSignal} from '@ionic-native/onesignal';
 
 
 //MyPages
@@ -187,8 +187,8 @@ const cloudSettings: CloudSettings = {
     Storage,
     FacebookLoginService,
     GoogleLoginService,
-    GoogleMapsService,
-    OneSignal
+    GoogleMapsService
+    // OneSignal
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

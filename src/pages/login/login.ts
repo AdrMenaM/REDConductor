@@ -82,24 +82,24 @@ export class LoginPage {
       // console.log(this.lstUsers[i].user.UserEmail+' '+this.lstUsers[i].user.UserPassword);
     }
     if(flag){
-      // let stringemail:string=this.login.get('email').value;
-      // let stringpasswd:string=this.login.get('password').value;
+      let stringemail:string=this.login.get('email').value;
+      let stringpasswd:string=this.login.get('password').value;
       this.nav.setRoot(this.main_page.component);
-      // let details = {'email': stringemail, 'password': stringpasswd};
+      let details = {'email': stringemail, 'password': stringpasswd};
 
-      // this.auth.login('basic', details).then(() => {
-      //           this.push.register().then((t: PushToken) => {
-      //             return this.push.saveToken(t);
-      //             }).then((t: PushToken) => {
-      //               console.log('Token saved:', t.token);
-      //           });
-      //             // `this.user` is now registered
-      //           }, (err: IDetailedError<string[]>) => {
-      //             for (let e of err.details) {
-      //               alert(e);
-      //             }
+      this.auth.login('basic', details).then(() => {
+                this.push.register().then((t: PushToken) => {
+                  return this.push.saveToken(t);
+                  }).then((t: PushToken) => {
+                    console.log('Token saved:', t.token);
+                });
+                  // `this.user` is now registered
+                }, (err: IDetailedError<string[]>) => {
+                  for (let e of err.details) {
+                    alert(e);
+                  }
                 
-      // });
+      });
 
       
 

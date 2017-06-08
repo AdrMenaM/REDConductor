@@ -227,6 +227,10 @@ export class MapsPage implements OnInit {
     
     this.socket.removeAllListeners();
 
+    this.socket.emit('AppDataUsersRequest','ex app');
+    this.socket.on('AppSelectUsers',(data)=>{
+      this.lstUsers = data;
+    });  
     
     this.socket.emit('SelectJourneys','ex app');
     this.socket.on('SelectJourneys',(data)=>{
@@ -326,6 +330,15 @@ export class MapsPage implements OnInit {
 
     if($('#btnBeginJourney').text()!="Pausar"){
       $('#btnBeginJourney').text("Pausar");
+
+      //primera posicion antes de moverse
+      var info1={
+              position: this.userMarker.marker.getPosition(),
+              user: this.current_user
+            }
+
+      this.socket.emit('AppTruckLocation',info1);
+      //////////////////////////////////
       
       for(var i = 0; i < this.lstDistributors.length; i++){
       for(var j=0;j<this.Orders.length;j++){
@@ -390,12 +403,14 @@ export class MapsPage implements OnInit {
                   // console.log("apptrucklocation"+info);
                   this.socket=io.connect(this.socketHost);
                   this.zone= new NgZone({enableLongStackTrace: false});
-                  this.socket.emit('AppTruckLocation',info);
-                  this.markMilestone();
+                  // this.socket.emit('AppTruckLocation',info);
+                  // this.markMilestone();
                   // Fin Manejo socket
                }
               
       }
+
+      
 
 // /////////////////////////////////////////////////////////////////////////////
               
@@ -524,40 +539,45 @@ export class MapsPage implements OnInit {
     var orderItem=[];
     var distributorPosition;
     this.flagButton=false;
-    for(var i = 0; i < this.lstDistributors.length; i++){
-      for(var j=0;j<this.Orders.length;j++){
-        // this.lstDistributors[i].DistributorId==route[j]
-        if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+    // for(var i = 0; i < this.lstDistributors.length; i++){
+    //   for(var j=0;j<this.Orders.length;j++){
+    //     // this.lstDistributors[i].DistributorId==route[j]
+    //     if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
           
-          this.routeItem.push(this.lstDistributors[i]);
-          if(this.Orders[j].OrderState=="En Proceso"){
-            orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
-            }
-          }     
+    //       routeItem.push(this.lstDistributors[i]);
+    //       if(this.Orders[j].OrderState=="En Proceso"){
+    //         orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
+    //         }
+    //       }     
 
-        }
-      }
+    //     }
+    //   }
 
-      this.routeItem.reverse();
+      // console.log(routeItem.reverse());
 
     //console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
     var info={
-              // position: this.userMarker.marker.getPosition(),
               position: posactual,
+              // position: posactual,
               user: this.current_user
             }
 
-            distributorPosition = new google.maps.LatLng(this.routeItem[this.routeItem.length-1].CoordX, this.routeItem[this.routeItem.length-1].CoordY);
+            if(this.routeItem.length!=0){
+              distributorPosition = new google.maps.LatLng(this.routeItem[this.routeItem.length-1].CoordX, this.routeItem[this.routeItem.length-1].CoordY);
               if(google.maps.geometry.spherical.computeDistanceBetween(info.position,distributorPosition) < 300){
+                
                 this.flagButton=true;
-                console.log(this.flagButton);
+                //console.log(this.flagButton);
                 this.socket.emit('NearNotification',this.routeItem[this.routeItem.length-1].DistributorName);
-                this.routeItem.pop();
+                console.log(this.routeItem.pop());
       //waypnts.push(distributorPosition);
               }else
               {
                 console.log(this.flagButton);
               }
+              
+            }
+            
             this.socketUpdate();
             //this.ShowJourney(info.position);
             this.setOrigin(info.position);
@@ -631,6 +651,7 @@ export class MapsPage implements OnInit {
       // console.log(routeItem.reverse());
 
     //console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
+    
     var info={
               position: this.userMarker.marker.getPosition(),
               // position: posactual,
@@ -643,7 +664,13 @@ export class MapsPage implements OnInit {
                 
                 this.flagButton=true;
                 //console.log(this.flagButton);
-                this.socket.emit('NearNotification',this.routeItem[this.routeItem.length-1].DistributorName);
+                console.log(info.user);
+                var mail=this.getEmail(this.routeItem[this.routeItem.length-1].PersonId);
+                var data={
+                  distributorName:this.routeItem[this.routeItem.length-1].DistributorName,
+                  email: mail
+                }
+                this.socket.emit('NearNotification',data);
                 console.log(this.routeItem.pop());
       //waypnts.push(distributorPosition);
               }else
@@ -661,8 +688,18 @@ export class MapsPage implements OnInit {
             // this.socket=io.connect(this.socketHost);
             // this.zone= new NgZone({enableLongStackTrace: false});
             this.socket.emit('AppTruckLocation',info);
+
+            this.markMilestone();
            
     
+  }
+
+  getEmail(personId:any){
+    for(var i=0; i<this.lstUsers.length;i++){
+      if(this.lstUsers[i].user.PERSONID==personId){
+        return this.lstUsers[i].user.USEREMAIL;
+      }
+    }
   }
 
   selectSearchResult(place: google.maps.places.AutocompletePrediction){
@@ -1107,6 +1144,8 @@ export class MapsPage implements OnInit {
                
              }
           }
+
+          this.lstRoutePoint.reverse();
 
 
           if(this.flaglstRoute==false)

@@ -11,7 +11,7 @@ import { FunctionalitiesPage } from '../pages/functionalities/functionalities';
 
 import { AlertController } from 'ionic-angular';
 
-import { OneSignal } from '@ionic-native/onesignal';
+// import { OneSignal } from '@ionic-native/onesignal';
 
 import {
   Push,
@@ -42,32 +42,47 @@ export class MyApp {
     public app: App,
     public push: Push,
     public alertCtrl:AlertController,
-    private oneSignal: OneSignal
+    // private oneSignal: OneSignal
   ) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       StatusBar.styleDefault();
       Splashscreen.hide();
+      // this.initPushNotification();
       
       
-      let notificationOpenedCallback = function(jsonData) {
-        let alert =alertCtrl.create({
-          title: jsonData.notification.payload.title,
-          subTitle: jsonData.notification.payload.body,
-          buttons: ['OK']
-        });
-        alert.present();
-        console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-      };
+      // let notificationOpenedCallback = function(jsonData) {
+      //   let alert =alertCtrl.create({
+      //     title: jsonData.notification.payload.title,
+      //     subTitle: jsonData.notification.payload.body,
+      //     buttons: ['OK']
+      //   });
+      //   alert.present();
+      //   console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+      // };
 
-      window["plugins"].OneSignal
-        .startInit("000c6b1b-f9cb-4bfe-a87d-4e3a188ef722", 737509012599)
-        .handleNotificationOpened(notificationOpenedCallback)
-        .endInit();
+      // window["plugins"].OneSignal
+      //   .startInit("000c6b1b-f9cb-4bfe-a87d-4e3a188ef722", "737509012599")
+      //   .handleNotificationOpened(notificationOpenedCallback)
+      //   .endInit();
+
+      this.push.register().then((t: PushToken) => {
+          return this.push.saveToken(t,{ignore_user:true});
+        }).then((t: PushToken) => {
+          console.log('Token saved:', t.token);
+          alert(t.token);
+      });
+
+      this.push.rx.notification()
+      .subscribe((msg) => {
+        alert(msg.title + ': ' + msg.text);
+      });
     
       
     });
+
+
 
     this.pages = [
       { title: 'Inicio', icon: 'home', component: TabsNavigationPage },
@@ -80,16 +95,7 @@ export class MyApp {
       { title: 'Perfil', icon: 'settings', component: SettingsPage },
     ];
 
-    // this.push.register().then((t: PushToken) => {
-    //     return this.push.saveToken(t);
-    //   }).then((t: PushToken) => {
-    //     console.log('Token saved:', t.token);
-    // });
-
-    // this.push.rx.notification()
-    // .subscribe((msg) => {
-    //   alert(msg.title + ': ' + msg.text);
-    // });
+    
   }
 
   

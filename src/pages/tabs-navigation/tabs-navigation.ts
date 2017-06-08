@@ -23,4 +23,8 @@ export class TabsNavigationPage {
     this.tab4Root = FormDeliveryPage;
 
   }
+
+  reload(){
+    this.tab4Root.reload();
+  }
 }

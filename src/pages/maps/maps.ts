@@ -10,6 +10,8 @@ import { GoogleMap } from "../../components/google-map/google-map";
 import { GoogleMapsService } from "./maps.service";
 import { MapsModel, MapPlace } from './maps.model';
 
+import { ListingPage } from '../listing/listing';
+
 import * as io from 'socket.io-client';
 import { Storage } from '@ionic/storage';
 import * as $ from 'jquery';
@@ -216,10 +218,16 @@ export class MapsPage implements OnInit {
 
     
 
+    
+
     // Fin Manejo socket
     this.socketUpdate();
 
 
+  }
+
+  public reload(){
+    this.ngOnInit();
   }
 
   socketUpdate(){
@@ -279,6 +287,34 @@ export class MapsPage implements OnInit {
     });
     this.socketUpdate();
     this.flagflag=true;
+
+    let alert = this.alertCtrl.create({
+          title: 'INICIAR VIAJE',
+          subTitle: '¿Desea iniciar el viaje ahora? Presione CONFIRMAR para ver su ruta.',
+            buttons: [
+              {
+                text: 'CANCELAR',
+                handler: () => {
+
+                  alert.dismiss();
+                  this.nav.setRoot(ListingPage);
+                }
+              },
+              {
+                text: 'CONFIRMAR',
+                handler: () => {
+                  alert.dismiss();
+                  this.geolocateMe();
+                  this.beginJourney();
+                  
+                }
+              }
+            ]
+    
+    });
+
+   
+    alert.present();
     // this.ShowJourney(); 
     // for(var i = 0; i < this.lstDistributors.length; i++){
     //   for(var j=0;j<this.Orders.length;j++){
@@ -328,8 +364,8 @@ export class MapsPage implements OnInit {
     
     // this.socketUpdate();
 
-    if($('#btnBeginJourney').text()!="Pausar"){
-      $('#btnBeginJourney').text("Pausar");
+    // if($('#btnBeginJourney').text()!="Pausar"){
+    //   $('#btnBeginJourney').text("Pausar");
 
       //primera posicion antes de moverse
       var info1={
@@ -420,11 +456,11 @@ export class MapsPage implements OnInit {
              
       });
       
-    }else{
-        $('#btnBeginJourney').text("Iniciar Viaje");
-        this.watch.unsubscribe();
-        this.userMarker.marker.setIcon('./assets/images/maps/truck.png');
-      }
+    // }else{
+    //     $('#btnBeginJourney').text("Iniciar Viaje");
+    //     this.watch.unsubscribe();
+    //     this.userMarker.marker.setIcon('./assets/images/maps/truck.png');
+    //   }
   }
 
   setOrigin(location: google.maps.LatLng){
@@ -567,8 +603,13 @@ export class MapsPage implements OnInit {
               if(google.maps.geometry.spherical.computeDistanceBetween(info.position,distributorPosition) < 300){
                 
                 this.flagButton=true;
+                var mail=this.getEmail(this.routeItem[this.routeItem.length-1].PersonId);
+                var data={
+                  distributorName:this.routeItem[this.routeItem.length-1].DistributorName,
+                  email: mail
+                }
                 //console.log(this.flagButton);
-                this.socket.emit('NearNotification',this.routeItem[this.routeItem.length-1].DistributorName);
+                this.socket.emit('NearNotification',data);
                 console.log(this.routeItem.pop());
       //waypnts.push(distributorPosition);
               }else
@@ -587,7 +628,7 @@ export class MapsPage implements OnInit {
             // this.zone= new NgZone({enableLongStackTrace: false});
             this.socket.emit('AppTruckLocation',info);
            
-    
+            this.markMilestone();
   }
 
 

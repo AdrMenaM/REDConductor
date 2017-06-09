@@ -198,11 +198,12 @@ export class MapsPage implements OnInit {
     public GoogleMapsService: GoogleMapsService,
     public storage: Storage,
     public alertCtrl: AlertController,
-    public popoverCtrl: PopoverController
+    public popoverCtrl: PopoverController,
+    public navparams:NavParams
   ) {
     this.socket=io.connect(this.socketHost);
     this.zone= new NgZone({enableLongStackTrace: false});
-    this.geolocateMe();
+    // this.geolocateMe();
 
     this.flagflag=true;
     // this.storage.get('person').then((aux)=>{
@@ -286,35 +287,44 @@ export class MapsPage implements OnInit {
       _loading.dismiss();
     });
     this.socketUpdate();
+    this.geolocateMe();
+    // this.geolocateMe();
     this.flagflag=true;
+    // var flagStarted: boolean=this.navparams.get('flag');
 
-    let alert = this.alertCtrl.create({
-          title: 'INICIAR VIAJE',
-          subTitle: '¿Desea iniciar el viaje ahora? Presione CONFIRMAR para ver su ruta.',
-            buttons: [
-              {
-                text: 'CANCELAR',
-                handler: () => {
+      // if(!flagStarted){
+      //   flagStarted=true;
+        
+      //   let alert = this.alertCtrl.create({
+      //       title: 'INICIAR VIAJE',
+      //       subTitle: '¿Desea iniciar el viaje ahora? Presione CONFIRMAR para ver su ruta.',
+      //         buttons: [
+      //           {
+      //             text: 'CANCELAR',
+      //             handler: () => {
 
-                  alert.dismiss();
-                  this.nav.setRoot(ListingPage);
-                }
-              },
-              {
-                text: 'CONFIRMAR',
-                handler: () => {
-                  alert.dismiss();
-                  this.geolocateMe();
-                  this.beginJourney();
-                  
-                }
-              }
-            ]
+      //               alert.dismiss();
+      //               this.nav.setRoot(ListingPage);
+      //             }
+      //           },
+      //           {
+      //             text: 'CONFIRMAR',
+      //             handler: () => {
+      //               alert.dismiss();
+      //               // this.geolocateMe();
+      //               this.beginJourney();
+                    
+      //             }
+      //           }
+      //         ]
+      
+      // });
+
     
-    });
+      // alert.present();
+    // }
 
-   
-    alert.present();
+    
     // this.ShowJourney(); 
     // for(var i = 0; i < this.lstDistributors.length; i++){
     //   for(var j=0;j<this.Orders.length;j++){
@@ -357,15 +367,16 @@ export class MapsPage implements OnInit {
 
   beginJourney(){
 
+    // this.geolocateMe();
     // var routeItem=[];
     var orderItem=[];
     var distributorPosition;
     var registrandoPosicion=false;
     
-    // this.socketUpdate();
+    this.socketUpdate();
 
-    // if($('#btnBeginJourney').text()!="Pausar"){
-    //   $('#btnBeginJourney').text("Pausar");
+    if($('#btnBeginJourney').text()!="Pausar"){
+      $('#btnBeginJourney').text("Pausar");
 
       //primera posicion antes de moverse
       var info1={
@@ -397,6 +408,7 @@ export class MapsPage implements OnInit {
       // console.log(routeItem.reverse());
       
       this.userMarker.marker.setIcon('./assets/images/maps/truckS.png');
+      console.log('marcador azul');
        
        this.watch=Geolocation.watchPosition({enableHighAccuracy: true,maximumAge: 30000}).subscribe((position: Geoposition)=>{
         
@@ -406,6 +418,7 @@ export class MapsPage implements OnInit {
               position: ultimaPosicion,
               user: this.current_user
             }
+        console.log('watchPosition');
 
             // let penultimaPosicion=ultimaPosicion;
             //   if(google.maps.geometry.spherical.computeDistanceBetween(ultimaPosicion,distributorPosition) < 20){
@@ -432,14 +445,13 @@ export class MapsPage implements OnInit {
                   //  distributorPosition = new google.maps.LatLng(routeItem[routeItem.length-1].CoordX, routeItem[routeItem.length-1].CoordY);
                   //   if(google.maps.geometry.spherical.computeDistanceBetween(ultimaPosicion,distributorPosition) < 300){
                   //     this.socket.emit('NearNotification',routeItem[routeItem.length-1].DistributorName);
-                  //     routeItem.pop();
-           
+                  //     routeItem.pop();           
                     // }
                   // Manejo socket
                   // console.log("apptrucklocation"+info);
                   this.socket=io.connect(this.socketHost);
                   this.zone= new NgZone({enableLongStackTrace: false});
-                  // this.socket.emit('AppTruckLocation',info);
+                  this.socket.emit('AppTruckLocation',info);
                   // this.markMilestone();
                   // Fin Manejo socket
                }
@@ -456,11 +468,11 @@ export class MapsPage implements OnInit {
              
       });
       
-    // }else{
-    //     $('#btnBeginJourney').text("Iniciar Viaje");
-    //     this.watch.unsubscribe();
-    //     this.userMarker.marker.setIcon('./assets/images/maps/truck.png');
-    //   }
+    }else{
+        $('#btnBeginJourney').text("Iniciar Viaje");
+        this.watch.unsubscribe();
+        this.userMarker.marker.setIcon('./assets/images/maps/truck.png');
+      }
   }
 
   setOrigin(location: google.maps.LatLng){
@@ -575,6 +587,10 @@ export class MapsPage implements OnInit {
     var orderItem=[];
     var distributorPosition;
     this.flagButton=false;
+
+    this.socketUpdate();
+            //this.ShowJourney(info.position);
+    // this.setOrigin(info.position);
     // for(var i = 0; i < this.lstDistributors.length; i++){
     //   for(var j=0;j<this.Orders.length;j++){
     //     // this.lstDistributors[i].DistributorId==route[j]
@@ -619,14 +635,13 @@ export class MapsPage implements OnInit {
               
             }
             
-            this.socketUpdate();
-            //this.ShowJourney(info.position);
-            this.setOrigin(info.position);
+            
 
 
             // this.socket=io.connect(this.socketHost);
             // this.zone= new NgZone({enableLongStackTrace: false});
             this.socket.emit('AppTruckLocation',info);
+            this.setOrigin(info.position);
            
             this.markMilestone();
   }
@@ -729,10 +744,7 @@ export class MapsPage implements OnInit {
             // this.socket=io.connect(this.socketHost);
             // this.zone= new NgZone({enableLongStackTrace: false});
             this.socket.emit('AppTruckLocation',info);
-
             this.markMilestone();
-           
-    
   }
 
   getEmail(personId:any){
@@ -773,7 +785,7 @@ export class MapsPage implements OnInit {
   geolocateMe(){
 
 
-    this.socketUpdate();
+    // this.socketUpdate();
     let env = this,
         _loading = env.loadingCtrl.create();
 
@@ -783,7 +795,7 @@ export class MapsPage implements OnInit {
     Geolocation.getCurrentPosition().then((position) => {
       let current_location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
       env.map_model.search_query = position.coords.latitude.toFixed(2) + ", " + position.coords.longitude.toFixed(2);
-      env.setOrigin(current_location);
+      this.setOrigin(current_location);
       env.map_model.using_geolocation = true;
 
       _loading.dismiss();

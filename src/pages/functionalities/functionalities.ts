@@ -11,6 +11,7 @@ import { ContactCardPage } from '../contact-card/contact-card';
 })
 export class FunctionalitiesPage {
   items: Array<{title: string, note?: string, component: any}>;
+  flagIniciar:boolean=false;
 
   constructor(public nav: NavController) {
     this.items = [
@@ -22,7 +23,14 @@ export class FunctionalitiesPage {
   }
 
   itemTapped(event, item) {
-    this.nav.push(item.component);
+    // if(!this.flagIniciar){
+    //   this.nav.setRoot(item.component);
+    //   this.flagIniciar=true;
+    // }
+    // else{
+      this.nav.push(item.component);
+    // }
+    
     // if(item.title=='Maps'){
     //   item.component.reload();
     // }

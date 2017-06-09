@@ -165,7 +165,9 @@ export class FormDeliveryPage {
 
     let deliveryData={journeyid: this.JourneyRoute.JourneyId, observation: this.delivery_form.get('observation').value, signature: split_2 , deliverytime: moment().format('YYYY-MM-DD h:mm:ss')};
     console.log(this.JourneyRoute.journeyid);
-    this.socket.emit('RegisterDelivery',deliveryData);    
+    this.socket.emit('RegisterDelivery',deliveryData);
+    this.socket.emit('UpdateOrderState',deliveryData.journeyid);      
+
     
     
 

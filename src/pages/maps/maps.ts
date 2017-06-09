@@ -236,10 +236,6 @@ export class MapsPage implements OnInit {
     
     this.socket.removeAllListeners();
 
-    this.socket.emit('AppDataUsersRequest','ex app');
-    this.socket.on('AppSelectUsers',(data)=>{
-      this.lstUsers = data;
-    });  
     
     this.socket.emit('SelectJourneys','ex app');
     this.socket.on('SelectJourneys',(data)=>{
@@ -377,15 +373,6 @@ export class MapsPage implements OnInit {
 
     if($('#btnBeginJourney').text()!="Pausar"){
       $('#btnBeginJourney').text("Pausar");
-
-      //primera posicion antes de moverse
-      var info1={
-              position: this.userMarker.marker.getPosition(),
-              user: this.current_user
-            }
-
-      this.socket.emit('AppTruckLocation',info1);
-      //////////////////////////////////
       
       for(var i = 0; i < this.lstDistributors.length; i++){
       for(var j=0;j<this.Orders.length;j++){
@@ -452,13 +439,15 @@ export class MapsPage implements OnInit {
                   this.socket=io.connect(this.socketHost);
                   this.zone= new NgZone({enableLongStackTrace: false});
                   this.socket.emit('AppTruckLocation',info);
+<<<<<<< HEAD
                   // this.markMilestone();
+=======
+                  this.markMilestone();
+>>>>>>> parent of ba75d61... send Push
                   // Fin Manejo socket
                }
               
       }
-
-      
 
 // /////////////////////////////////////////////////////////////////////////////
               
@@ -587,6 +576,7 @@ export class MapsPage implements OnInit {
     var orderItem=[];
     var distributorPosition;
     this.flagButton=false;
+<<<<<<< HEAD
 
     this.socketUpdate();
             //this.ShowJourney(info.position);
@@ -595,30 +585,35 @@ export class MapsPage implements OnInit {
     //   for(var j=0;j<this.Orders.length;j++){
     //     // this.lstDistributors[i].DistributorId==route[j]
     //     if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+=======
+    for(var i = 0; i < this.lstDistributors.length; i++){
+      for(var j=0;j<this.Orders.length;j++){
+        // this.lstDistributors[i].DistributorId==route[j]
+        if(this.lstDistributors[i].DistributorId==this.Orders[j].DistributorId){
+>>>>>>> parent of ba75d61... send Push
           
-    //       routeItem.push(this.lstDistributors[i]);
-    //       if(this.Orders[j].OrderState=="En Proceso"){
-    //         orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
-    //         }
-    //       }     
+          this.routeItem.push(this.lstDistributors[i]);
+          if(this.Orders[j].OrderState=="En Proceso"){
+            orderItem.push(this.lstDistributors[i]);//contiene solo ordenes que aun no han sido completadas
+            }
+          }     
 
-    //     }
-    //   }
+        }
+      }
 
-      // console.log(routeItem.reverse());
+      this.routeItem.reverse();
 
     //console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
     var info={
+              // position: this.userMarker.marker.getPosition(),
               position: posactual,
-              // position: posactual,
               user: this.current_user
             }
 
-            if(this.routeItem.length!=0){
-              distributorPosition = new google.maps.LatLng(this.routeItem[this.routeItem.length-1].CoordX, this.routeItem[this.routeItem.length-1].CoordY);
+            distributorPosition = new google.maps.LatLng(this.routeItem[this.routeItem.length-1].CoordX, this.routeItem[this.routeItem.length-1].CoordY);
               if(google.maps.geometry.spherical.computeDistanceBetween(info.position,distributorPosition) < 300){
-                
                 this.flagButton=true;
+<<<<<<< HEAD
                 var mail=this.getEmail(this.routeItem[this.routeItem.length-1].PersonId);
                 var data={
                   distributorName:this.routeItem[this.routeItem.length-1].DistributorName,
@@ -627,15 +622,26 @@ export class MapsPage implements OnInit {
                 //console.log(this.flagButton);
                 this.socket.emit('NearNotification',data);
                 console.log(this.routeItem.pop());
+=======
+                console.log(this.flagButton);
+                this.socket.emit('NearNotification',this.routeItem[this.routeItem.length-1].DistributorName);
+                this.routeItem.pop();
+>>>>>>> parent of ba75d61... send Push
       //waypnts.push(distributorPosition);
               }else
               {
                 console.log(this.flagButton);
               }
+<<<<<<< HEAD
               
             }
             
             
+=======
+            this.socketUpdate();
+            //this.ShowJourney(info.position);
+            this.setOrigin(info.position);
+>>>>>>> parent of ba75d61... send Push
 
 
             // this.socket=io.connect(this.socketHost);
@@ -707,7 +713,6 @@ export class MapsPage implements OnInit {
       // console.log(routeItem.reverse());
 
     //console.log(this.userMarker.marker.getPosition().lat()+" "+this.userMarker.marker.getPosition().lng());
-    
     var info={
               position: this.userMarker.marker.getPosition(),
               // position: posactual,
@@ -720,13 +725,7 @@ export class MapsPage implements OnInit {
                 
                 this.flagButton=true;
                 //console.log(this.flagButton);
-                console.log(info.user);
-                var mail=this.getEmail(this.routeItem[this.routeItem.length-1].PersonId);
-                var data={
-                  distributorName:this.routeItem[this.routeItem.length-1].DistributorName,
-                  email: mail
-                }
-                this.socket.emit('NearNotification',data);
+                this.socket.emit('NearNotification',this.routeItem[this.routeItem.length-1].DistributorName);
                 console.log(this.routeItem.pop());
       //waypnts.push(distributorPosition);
               }else
@@ -744,15 +743,12 @@ export class MapsPage implements OnInit {
             // this.socket=io.connect(this.socketHost);
             // this.zone= new NgZone({enableLongStackTrace: false});
             this.socket.emit('AppTruckLocation',info);
+<<<<<<< HEAD
             this.markMilestone();
-  }
-
-  getEmail(personId:any){
-    for(var i=0; i<this.lstUsers.length;i++){
-      if(this.lstUsers[i].user.PERSONID==personId){
-        return this.lstUsers[i].user.USEREMAIL;
-      }
-    }
+=======
+           
+    
+>>>>>>> parent of ba75d61... send Push
   }
 
   selectSearchResult(place: google.maps.places.AutocompletePrediction){
@@ -1197,8 +1193,6 @@ export class MapsPage implements OnInit {
                
              }
           }
-
-          this.lstRoutePoint.reverse();
 
 
           if(this.flaglstRoute==false)
